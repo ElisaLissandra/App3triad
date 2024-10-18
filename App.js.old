@@ -1,0 +1,38 @@
+import React, { useEffect } from 'react';
+import { Button, View, StyleSheet } from 'react-native';
+import * as Google from 'expo-auth-session/providers/google';
+import { makeRedirectUri } from 'expo-auth-session';
+
+export default function App() {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: '1087113360046-ge3sm56ppgi7crg68qfjj64fbunfolvc.apps.googleusercontent.com',
+    redirectUri: makeRedirectUri({
+      useProxy: true,
+    }),
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      console.log('Authentication:', authentication);
+      // Aqui você pode usar a autenticação para fazer login no Firebase ou em outro serviço
+    } else if (response?.type === 'error') {
+      console.log('Error during authentication:', response.error);
+    }
+  }, [response]);
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button
+        title="Entrar com o Google"
+        onPress={() => promptAsync()}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

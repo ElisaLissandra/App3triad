@@ -2,6 +2,7 @@
   "expo": {
     "name": "App3triad",
     "slug": "App3triad",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "scheme": "3triad"
   }
 }

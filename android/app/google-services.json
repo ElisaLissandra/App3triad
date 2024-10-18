@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "365241359470",
+    "project_id": "triad-74462",
+    "storage_bucket": "triad-74462.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365241359470:android:2da7aca1a9fad0a12a5a7f",
+        "android_client_info": {
+          "package_name": "com.app_3triad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365241359470-1v7ns39anv2aq28n2hs1q73bvp1o9bon.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app_3triad",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "365241359470-o472ecisr7giti0n5p3bkqgvjfivtueb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXwi2jxgJV3Dsn8vQ_ZyVH2Km3K652pBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "365241359470-o472ecisr7giti0n5p3bkqgvjfivtueb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
