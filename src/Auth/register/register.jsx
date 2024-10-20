@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase-config";
+import { auth } from "../../../firebase-config";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import styles from "./styles";
 

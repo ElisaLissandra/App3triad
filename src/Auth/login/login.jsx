@@ -8,9 +8,8 @@ import {
   onAuthStateChanged,
   signInWithCredential,
 } from "firebase/auth";
-import { auth } from "../../firebase-config";
+import { auth } from "../../../firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
-
 import {
   View,
   Text,
