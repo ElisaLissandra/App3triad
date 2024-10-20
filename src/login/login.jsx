@@ -1,12 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import * as Google from "expo-auth-session/providers/google";
@@ -18,6 +10,16 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
+
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -49,11 +51,15 @@ const LoginScreen = () => {
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password) 
       .then((userCredential) => {
-        console.log('Usuário autenticado com sucesso:', userCredential.user);
+        const user = userCredential.user;
+        console.log('Usuário autenticado com sucesso:', user);
         navigation.navigate("RequestProject");
       })
       .catch((error) => {
-        console.error('Erro ao autenticar com email e senha:', error);
+       const errorCode = error.code;
+       const errorMessage = error.message;
+
+       console.log(errorMessage);
       });
   };
 

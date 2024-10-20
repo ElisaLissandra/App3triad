@@ -7,9 +7,12 @@ import Register from './src/register/register';
 import RequestProject from './src/request_project/request_project';
 
 
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  //const [user, setUser] = React.useState();
+  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
