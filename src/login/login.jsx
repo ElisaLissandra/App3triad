@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,23 +9,61 @@ import {
 } from "react-native";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+} from "firebase/auth";
+import { auth } from "../../firebase-config";
+
+WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
-
   const navigation = useNavigation(); // Obtendo a função de navegação
 
   const handleRegister = () => {
-    navigation.navigate('Register'); // Navegando para a tela de Login
+    navigation.navigate("Register"); // Navegando para a tela de Login
   };
+
+  const [userInfo, setUserInfo] = useState();
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId:
+      "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
+    redirectUri: "https://auth.expo.io/@elisa_expo/App3triad",
+  });
+
+ /*  React.useEffect(() => {
+    if(response?.type == "success") {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(auth, credential)
+    }
+  }, [response]);  */
+
+  
+  useEffect(() => {
+    console.log("response", response);
+    console.log("request", request);
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(auth, credential)
+        .then((userCredential) => {
+          console.log('Usuário autenticado com sucesso:', userCredential.user);
+        })
+        .catch((error) => {
+          console.error('Erro ao autenticar com Google:', error);
+        });
+    }
+  }, [response]);
+  
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    // Lógica de autenticação aqui
-    console.log("Email:", email);
-    console.log("Senha:", password);
-  };
+  const handleLogin = () => {};
 
   return (
     <View style={styles.container}>
@@ -36,7 +74,7 @@ const LoginScreen = () => {
         style={styles.input}
         placeholder="" // Remove placeholder as label is used
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => setEmail(text)}
       />
       {/* Label for Password Input */}
       <Text style={styles.label}>Senha:</Text>
@@ -45,25 +83,24 @@ const LoginScreen = () => {
         placeholder="" // Remove placeholder as label is used
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => setPassword(text)}
       />
       <Text style={styles.link}>Esqueceu a senha?</Text>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
 
-
       <View style={styles.googleButton}>
-        {/* <Image
-          source={require("./google-icon.png")}
-          style={styles.googleIcon}
-        /> */}
-        <Text style={styles.googleButtonText}>Acessar com Google</Text>
+        <TouchableOpacity onPress={() => promptAsync()}>
+          <Text style={styles.googleButtonText}>Acessar com Google</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.linkRegister}>
         Não tem uma conta?{" "}
-        <Text style={styles.registerButton} onPress={handleRegister}>Cadastre-se</Text>
+        <Text style={styles.registerButton} onPress={handleRegister}>
+          Cadastre-se
+        </Text>
       </Text>
     </View>
   );

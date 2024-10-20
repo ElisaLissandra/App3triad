@@ -5,6 +5,7 @@ import Welcome from './src/welcome';
 import Login from './src/login/login';
 import Register from './src/register/register';
 
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {

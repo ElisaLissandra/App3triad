@@ -2,7 +2,19 @@
   "expo": {
     "name": "App3triad",
     "slug": "App3triad",
+    "owner": "elisa_expo",
+    "scheme": "3triad",
     "version": "1.0.0",
-    "scheme": "3triad"
+    "extra": {
+      "eas": {
+        "projectId": "1831b5da-99d6-4203-a385-040bd1090c90"
+      }
+    },
+    "android": {
+      "package": "com.elisa_expo.App3triad"
+    },
+    "ios": {
+      "bundleIdentifier": "n"
+    }
   }
 }

@@ -1,4 +1,4 @@
-package com.app3triad
+package com.elisa_expo.App3triad
 
 import android.app.Application
 import android.content.res.Configuration

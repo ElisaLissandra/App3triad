@@ -26,6 +26,7 @@ const RegisterScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword(!showConfirmPassword);
@@ -41,7 +42,7 @@ const RegisterScreen = () => {
         style={styles.input}
         placeholder="example@mail.com"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => setEmail(text)}
       />
 
       {/* Nome Completo Input */}
@@ -99,7 +100,7 @@ const RegisterScreen = () => {
           placeholder="Confirmar senha"
           secureTextEntry={!showConfirmPassword}
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(text) => setConfirmPassword(text)}
         />
         <TouchableOpacity
           style={styles.toggleButton}
