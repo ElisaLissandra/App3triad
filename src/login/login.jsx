@@ -17,6 +17,7 @@ import {
   signInWithCredential,
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -28,6 +29,9 @@ const LoginScreen = () => {
   };
 
   const [userInfo, setUserInfo] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId:
       "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
@@ -41,6 +45,17 @@ const LoginScreen = () => {
       signInWithCredential(auth, credential)
     }
   }, [response]);  */
+
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password) 
+      .then((userCredential) => {
+        console.log('Usuário autenticado com sucesso:', userCredential.user);
+        navigation.navigate("RequestProject");
+      })
+      .catch((error) => {
+        console.error('Erro ao autenticar com email e senha:', error);
+      });
+  };
 
   
   useEffect(() => {
@@ -58,12 +73,6 @@ const LoginScreen = () => {
         });
     }
   }, [response]);
-  
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = () => {};
 
   return (
     <View style={styles.container}>

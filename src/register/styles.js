@@ -1,105 +1,105 @@
 
 import { StyleSheet } from 'react-native';
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#007f7f',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF", // Fundo azul conforme a imagem
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#007f7f',
+    fontSize: 50,
+    fontWeight: "bold",
+    color: "#0097B2",
     marginBottom: 10,
+    marginTop:50
   },
   subtitle: {
     fontSize: 16,
-    color: '#000',
+    color: "#878787",
     marginBottom: 30,
   },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 15,
-  },
   label: {
-    width: "80%",
-    textAlign: 'left',
     fontSize: 16,
+    color: "#1E1E1E",
+    width: "100%",
+    textAlign: "left",
     marginBottom: 5,
-    color: '#1E1E1E', 
-    marginLeft: 10,
   },
   input: {
-    width: "80%",
-    height: 60,
-    borderWidth: 1,
+    width: "100%",
+    height: 50,
     borderColor: "#E5E5E5",
+    borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 20,
-    color: "#1E1E1E", 
+    backgroundColor: "#fff",
   },
-  passwordInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+  passwordContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
   },
   inputPassword: {
+    width: "100%",
     flex: 1,
-    padding: 12,
-    fontSize: 16,
+    height: 50,
+    borderColor: "#E5E5E5",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    backgroundColor: "#fff",
   },
-  eyeIcon: {
-    padding: 12,
+  toggleButton: {
+    paddingHorizontal: 10,
   },
-  termsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  toggleText: {
+    fontSize: 18,
+    color: "#555",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
+    width: "100%",
   },
-  termsText: {
-    fontSize: 14,
-    color: '#000',
-    marginLeft: 10,
+  checkbox: {
+    marginRight: 10,
+  },
+  checkboxLabel: {
+    color: "#000",
+    flexWrap: "wrap",
   },
   link: {
-    color: '#009999',
-    fontWeight: 'bold',
+    color: "#0097B2",
+    textDecorationLine: "underline",
   },
   registerButton: {
-    backgroundColor: '#009999',
-    paddingVertical: 15,
-    borderRadius: 30,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
+    width: "100%",
+    height: 50,
+    backgroundColor: "#0097B2",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 25,
+    marginTop: 10,
   },
   registerButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    fontWeight: "bold",
   },
   loginText: {
-    fontSize: 14,
-    color: '#000',
+    marginTop: 20,
+    color: "#000",
   },
   loginLink: {
-    fontSize: 14,
-    color: '#009999',
-    fontWeight: 'bold',
+    color: "#0097B2",
+    fontWeight: "bold",
   },
 });
-
 
 export default styles;
