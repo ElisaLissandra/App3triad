@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  CheckBox,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -15,12 +18,8 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import styles from "./styles";
 
 const RegisterScreen = () => {
-  const navigation = useNavigation(); // Obtendo a função de navegação
+  const navigation = useNavigation();
   const db = getFirestore();
-
-  const handleLogin = () => {
-    navigation.navigate("Login"); // Navegando para a tela de Login
-  };
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -28,9 +27,29 @@ const RegisterScreen = () => {
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  // Listen for keyboard show/hide events
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+      setIsKeyboardVisible(false);
+    });
+
+    // Cleanup listeners on unmount
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  const handleLogin = () => {
+    navigation.navigate("Login");
+  };
 
   const handleRegister = async () => {
     try {
@@ -39,7 +58,7 @@ const RegisterScreen = () => {
         email,
         password
       );
-      const userId = userCredential.user.uid; // Get the user ID
+      const userId = userCredential.user.uid;
 
       // Prepare user data for Firestore
       const userData = {
@@ -61,118 +80,107 @@ const RegisterScreen = () => {
     }
   };
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () =>
-    setShowConfirmPassword(!showConfirmPassword);
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>3triad</Text>
-      <Text style={styles.subtitle}>Crie uma conta e faça seu orçamento</Text>
-
-      {/* Email Input */}
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="example@mail.com"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-      />
-
-      {/* Nome Completo Input */}
-      <Text style={styles.label}>Nome Completo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome Completo"
-        value={fullName}
-        onChangeText={(text) => setFullName(text)}
-      />
-
-      {/* Data de nascimento Input */}
-      <Text style={styles.label}>Data de nascimento</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="DD/MM/YYYY"
-        value={birthDate}
-        onChangeText={(text) => setBirthDate(text)}
-      />
-
-      {/* Contato Input */}
-      <Text style={styles.label}>Contato</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="(00) 00000-0000"
-        value={contact}
-        onChangeText={(text) => setContact(text)}
-      />
-
-      {/* Senha Input */}
-      <Text style={styles.label}>Senha</Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.inputPassword}
-          placeholder="Senha"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <TouchableOpacity
-          style={styles.toggleButton}
-          onPress={togglePasswordVisibility}
-        >
-          {/*  <Text style={styles.toggleText}>
-            {showPassword ? "👁️" : "🙈"}
-          </Text> */}
-        </TouchableOpacity>
-      </View>
-
-      {/* Confirmar Senha Input */}
-      <Text style={styles.label}>Confirmar senha</Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.inputPassword}
-          placeholder="Confirmar senha"
-          secureTextEntry={!showConfirmPassword}
-          value={confirmPassword}
-          onChangeText={(text) => setConfirmPassword(text)}
-        />
-        <TouchableOpacity
-          style={styles.toggleButton}
-          onPress={toggleConfirmPasswordVisibility}
-        >
-          {/*  <Text style={styles.toggleText}>
-            {showConfirmPassword ? "👁️" : "🙈"}
-          </Text> */}
-        </TouchableOpacity>
-      </View>
-
-      {/* Terms and Policy Agreement */}
-      {/* <View style={styles.checkboxContainer}>
-        <CheckBox
-          value={agreeTerms}
-          onValueChange={setAgreeTerms}
-          style={styles.checkbox}
-        />
-        <Text style={styles.checkboxLabel}>
-          I Agree with{" "}
-          <Text style={styles.link}>Terms of Service</Text> and{" "}
-          <Text style={styles.link}>Privacy Policy</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "android" ? "padding" : "height"}
+      keyboardVerticalOffset={20}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>3triad</Text>
+        <Text style={styles.subtitle}>
+          Crie uma conta e solicite seu projeto
         </Text>
-      </View> */}
 
-      {/* Register Button */}
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Cadastrar</Text>
-      </TouchableOpacity>
+        {/* Email Input */}
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="example@mail.com"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+        />
 
-      {/* Login Link */}
-      <Text style={styles.loginText}>
-        Não tem uma conta?{" "}
-        <Text style={styles.loginLink} onPress={handleLogin}>
-          Login
+        {/* Nome Completo Input */}
+        <Text style={styles.label}>Nome Completo</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome Completo"
+          value={fullName}
+          onChangeText={(text) => setFullName(text)}
+        />
+
+        {/* Data de nascimento Input */}
+        <Text style={styles.label}>Data de nascimento</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="DD/MM/YYYY"
+          value={birthDate}
+          onChangeText={(text) => setBirthDate(text)}
+        />
+
+        {/* Contato Input */}
+        <Text style={styles.label}>Contato</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="(00) 00000-0000"
+          value={contact}
+          onChangeText={(text) => setContact(text)}
+        />
+
+        {/* Senha Input */}
+        <Text style={styles.label}>Senha</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.inputPassword}
+            placeholder="Senha"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+          />
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            {/* Optional: Add visibility toggle icon */}
+          </TouchableOpacity>
+        </View>
+
+        {/* Confirmar Senha Input */}
+        <Text style={styles.label}>Confirmar senha</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.inputPassword}
+            placeholder="Confirmar senha"
+            secureTextEntry={!showConfirmPassword}
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+          />
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {/* Optional: Add visibility toggle icon */}
+          </TouchableOpacity>
+        </View>
+
+        {/* Register Button */}
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleRegister}
+        >
+          <Text style={styles.registerButtonText}>Cadastrar</Text>
+        </TouchableOpacity>
+
+        {/* Login Link */}
+        <Text style={styles.loginText}>
+          Não tem uma conta?{" "}
+          <Text style={styles.loginLink} onPress={handleLogin}>
+            Login
+          </Text>
         </Text>
-      </Text>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

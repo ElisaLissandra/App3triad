@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import styles from "./styles";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -9,7 +9,7 @@ const WelcomeScreen = () => {
   const navigation = useNavigation(); // Obtendo a função de navegação
 
   const handleLogin = () => {
-    navigation.navigate('Login'); // Navegando para a tela de Login
+    navigation.navigate("Login"); // Navegando para a tela de Login
   };
 
   return (
@@ -22,12 +22,11 @@ const WelcomeScreen = () => {
             Solicite agora seu projeto de forma rápida e fácil!
           </Text>
           {/* O Link envolve o TouchableOpacity */}
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <View style={styles.buttonIcon}>
-                {/* <Text style={styles.buttonArrow}>→</Text> */}
-                {/* <FontAwesomeIcon icon={faArrowRight} /> */}
-              </View>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <View style={styles.buttonIcon}>
+              <FontAwesome5 name="arrow-right" size={24} color="#0097B2" />
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

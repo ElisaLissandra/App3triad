@@ -80,16 +80,40 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
 
   },
-  linkRegister: {
+  linkLogin: {
     color: '#303030', 
     textDecorationLine: "none",
     width: "80%",
     textAlign: 'center',
     marginTop: 40,
   },
-  registerButton: {
+  LoginButton: {
     color: '#0097B2', 
     fontWeight: 'bold', 
+  },
+  /* passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  eyeIcon: {
+    marginLeft: 10,
+  }, */
+  passwordContainer: {
+    width: "80%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  inputPassword: {
+    flex: 1,
+    padding: 10,
+  },
+  eyeIcon: {
+    padding: 10,
   },
 });
 

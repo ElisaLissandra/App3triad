@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+import { FontAwesome5 } from '@expo/vector-icons';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,6 +33,7 @@ const LoginScreen = () => {
   const [userInfo, setUserInfo] = useState();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId:
@@ -92,13 +94,22 @@ const LoginScreen = () => {
       />
       {/* Label for Password Input */}
       <Text style={styles.label}>Senha:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="" // Remove placeholder as label is used
-        secureTextEntry
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.inputPassword}
+          placeholder=""
+          secureTextEntry={!showPassword} // Controla a visibilidade da senha
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(prev => !prev)} style={styles.eyeIcon}>
+          <FontAwesome5 
+            name={showPassword ? "eye" : "eye-slash"}
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.link}>Esqueceu a senha?</Text>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
@@ -110,9 +121,9 @@ const LoginScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.linkRegister}>
+      <Text style={styles.linkLogin}>
         Não tem uma conta?{" "}
-        <Text style={styles.registerButton} onPress={handleRegister}>
+        <Text style={styles.LoginButton} onPress={handleRegister}>
           Cadastre-se
         </Text>
       </Text>

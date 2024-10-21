@@ -1,10 +1,20 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  container: {
+  /* container: {
     flex: 1,
     padding: 20,
     backgroundColor: "#FFFFFF",
+  }, */
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: "center",
+  },
+  scrollContainer: {
+    flexGrow: 1, 
+    padding: 20, 
+    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 18,

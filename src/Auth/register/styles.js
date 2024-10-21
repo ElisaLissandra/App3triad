@@ -4,22 +4,28 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF", // Fundo azul conforme a imagem
-    paddingHorizontal: 20,
+  },
+  scrollContainer: {
+    flexGrow: 1, 
+    padding: 20, 
+    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 50,
     fontWeight: "bold",
     color: "#0097B2",
     marginBottom: 10,
-    marginTop:50
+    marginTop:20,
+    textAlign: 'center',
+  
   },
   subtitle: {
     fontSize: 16,
     color: "#878787",
     marginBottom: 30,
+    textAlign: 'center',
   },
   label: {
     fontSize: 16,
@@ -95,6 +101,7 @@ const styles = StyleSheet.create({
   loginText: {
     marginTop: 20,
     color: "#000",
+    textAlign: 'center',
   },
   loginLink: {
     color: "#0097B2",
