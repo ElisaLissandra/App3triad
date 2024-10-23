@@ -3,7 +3,7 @@
     "name": "App3triad",
     "slug": "App3triad",
     "owner": "elisa_expo",
-    "scheme": "3triad",
+    "scheme": "app3triad",
     "version": "1.0.0",
     "extra": {
       "eas": {

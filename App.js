@@ -5,6 +5,7 @@ import Welcome from './src/Screens/welcome/welcome';
 import Login from './src/Auth/login/login';
 import Register from './src/Auth/register/register';
 import RequestProject from './src/Screens/request_project/request_project';
+import ListProject from './src/Screens/list_project/list_project';
 import { auth } from './firebase-config';
 
 const Stack = createNativeStackNavigator();
@@ -37,6 +38,12 @@ export default function App() {
         />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+        <Stack.Screen name="ListProject" component={ListProject} options={{ headerShown: false }} />
+       {/*  <Stack.Screen
+          name="RequestProject"
+          component={RequestProject}
+          options={{ headerShown: false }}
+        /> */}
         
         {/* Protegendo a rota RequestProject */}
         <Stack.Screen

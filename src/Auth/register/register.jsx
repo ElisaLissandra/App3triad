@@ -15,6 +15,8 @@ import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../firebase-config";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { FontAwesome5 } from '@expo/vector-icons';
+import { TextInputMask } from 'react-native-masked-text'; // Importar a biblioteca de máscara
 import styles from "./styles";
 
 const RegisterScreen = () => {
@@ -52,6 +54,22 @@ const RegisterScreen = () => {
   };
 
   const handleRegister = async () => {
+    // Validações
+    if (!email || !fullName || !birthDate || !contact || !password || !confirmPassword) {
+      Alert.alert("Erro", "Todos os campos são obrigatórios.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Erro", "As senhas não correspondem.");
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert("Erro", "Insira um email válido.");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -112,7 +130,11 @@ const RegisterScreen = () => {
 
         {/* Data de nascimento Input */}
         <Text style={styles.label}>Data de nascimento</Text>
-        <TextInput
+        <TextInputMask
+          type={'datetime'}
+          options={{
+            format: 'DD/MM/YYYY'
+          }}
           style={styles.input}
           placeholder="DD/MM/YYYY"
           value={birthDate}
@@ -121,7 +143,11 @@ const RegisterScreen = () => {
 
         {/* Contato Input */}
         <Text style={styles.label}>Contato</Text>
-        <TextInput
+        <TextInputMask
+          type={'custom'}
+          options={{
+            mask: '(99) 99999-9999'
+          }}
           style={styles.input}
           placeholder="(00) 00000-0000"
           value={contact}
@@ -138,11 +164,12 @@ const RegisterScreen = () => {
             value={password}
             onChangeText={(text) => setPassword(text)}
           />
-          <TouchableOpacity
-            style={styles.toggleButton}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            {/* Optional: Add visibility toggle icon */}
+          <TouchableOpacity onPress={() => setShowPassword(prev => !prev)} style={styles.eyeIcon}>
+            <FontAwesome5 
+              name={showPassword ? "eye" : "eye-slash"}
+              size={24}
+              color="black"
+            />
           </TouchableOpacity>
         </View>
 
@@ -156,11 +183,12 @@ const RegisterScreen = () => {
             value={confirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
           />
-          <TouchableOpacity
-            style={styles.toggleButton}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            {/* Optional: Add visibility toggle icon */}
+          <TouchableOpacity onPress={() => setShowConfirmPassword(prev => !prev)} style={styles.eyeIcon}>
+            <FontAwesome5 
+              name={showConfirmPassword ? "eye" : "eye-slash"}
+              size={24}
+              color="black"
+            />
           </TouchableOpacity>
         </View>
 

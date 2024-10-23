@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: "#fff",
   },
-  passwordContainer: {
+  /* passwordContainer: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -59,6 +59,23 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     backgroundColor: "#fff",
+  }, */
+  passwordContainer: {
+    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  inputPassword: {
+    flex: 1,
+    padding: 10,
+  },
+  eyeIcon: {
+    padding: 10,
   },
   toggleButton: {
     paddingHorizontal: 10,

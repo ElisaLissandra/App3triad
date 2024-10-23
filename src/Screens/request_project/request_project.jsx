@@ -15,6 +15,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { db, storage } from "../../../firebase-config"; // Importando o Firestore e o Storage
 import { collection, addDoc } from "firebase/firestore"; // Certifique-se de que essa importação está correta
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import * as FileSystem from 'expo-file-system';
 import styles from "./styles";
 
 const RequestProject = () => {
@@ -53,15 +54,17 @@ const RequestProject = () => {
 
   const toggleSwitch = () => setUrgent((previousState) => !previousState);
 
-  const handleFileUpload = async () => {
+
+  /* const handleFileUpload = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({});
-      if (result.type === "success") {
-        setFileUri(result.uri); // Armazena o URI do arquivo
-        setFileName(result.name); // Armazena o nome do arquivo
-        setFileSize(result.size); // Armazena o tamanho do arquivo
-        setFileDate(new Date(result.modificationTime).toLocaleDateString()); // Armazena a data de modificação do arquivo
-        Alert.alert("Arquivo anexado:", result.name);
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const file = result.assets[0]; // Acesse o primeiro arquivo da lista
+        setFileUri(file.uri); // Armazena o URI do arquivo
+        setFileName(file.name); // Armazena o nome do arquivo
+        setFileSize(file.size); // Armazena o tamanho do arquivo
+        setFileDate(new Date(file.modificationTime).toLocaleDateString()); // Armazena a data de modificação do arquivo
+        Alert.alert("Arquivo anexado:", file.name);
       } else {
         Alert.alert("Nenhum arquivo selecionado.");
       }
@@ -70,6 +73,7 @@ const RequestProject = () => {
       console.log("Erro ao anexar arquivo:", error.message);
     }
   };
+  
 
   const handleSubmit = async () => {
     if (!title || !description || !generalContext || !deadline) {
@@ -116,7 +120,88 @@ const RequestProject = () => {
       Alert.alert("Erro", "Erro ao enviar o projeto: " + error.message);
       console.log("Erro", "Erro ao enviar o projeto: " + error.message);
     }
+  };   */
+
+  const handleFileUpload = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({});
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const file = result.assets[0]; // Acesse o primeiro arquivo da lista
+        setFileUri(file.uri);
+        setFileName(file.name);
+        setFileSize(file.size);
+        setFileDate(new Date(file.modificationTime).toLocaleDateString());
+        Alert.alert("Arquivo anexado:", file.name);
+      } else {
+        Alert.alert("Nenhum arquivo selecionado.");
+      }
+    } catch (error) {
+      Alert.alert("Erro ao anexar arquivo:", error.message);
+      console.log("Erro ao anexar arquivo:", error.message);
+    }
   };
+  
+  const handleSubmit = async () => {
+    if (!title || !description || !generalContext || !deadline) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      return;
+    }
+  
+    try {
+      let fileUrl = ""; // Variável para armazenar a URL do arquivo
+  
+      if (fileUri) {
+        try {
+          console.log("Iniciando upload do arquivo:", fileUri);
+          
+          // Ler o arquivo como base64
+          const base64 = await FileSystem.readAsStringAsync(fileUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+      
+          // Criar um blob a partir do base64
+          const base64Response = await fetch(`data:image/jpeg;base64,${base64}`);
+          const blob = await base64Response.blob();
+      
+          // Criar uma referência no Firebase Storage
+          const storageRef = ref(storage, `uploads/${Date.now()}_${fileName}`);
+          await uploadBytes(storageRef, blob); // Enviar o arquivo para o Storage
+      
+          // Obter a URL do arquivo após o upload
+          fileUrl = await getDownloadURL(storageRef);
+          console.log("Upload bem-sucedido. URL do arquivo:", fileUrl);
+        } catch (uploadError) {
+          Alert.alert("Erro ao fazer upload do arquivo", uploadError.message);
+          console.error("Erro ao fazer upload do arquivo:", uploadError);
+        }
+      }
+  
+      // Adicionar dados ao Firestore
+      await addDoc(collection(db, "projetos"), {
+        title,
+        description,
+        generalContext,
+        deadline,
+        urgent,
+        fileUrl,
+        status: "pendente",
+      });
+  
+      Alert.alert("Sucesso", "Projeto enviado com sucesso!");
+  
+      // Limpar campos do formulário após o envio
+      setTitle("");
+      setDescription("");
+      setGeneralContext("");
+      setDeadline("");
+      setUrgent(false);
+      setFileUri(null);
+    } catch (error) {
+      Alert.alert("Erro ao enviar o projeto", error.message);
+      console.error("Erro ao enviar o projeto:", error);
+    }
+  };
+  
 
   return (
     <KeyboardAvoidingView

@@ -29,6 +29,7 @@
         <data android:scheme="exp+app3triad"/>
         <data android:scheme="A--3triad"/>
         <data android:scheme="com.elisa_expo.App3triad"/>
+        <data android:scheme="app3triad"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
