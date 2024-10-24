@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, FlatList, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase-config";
 
 const Projeto = ({ title, description, date, alert }) => {
   return (
@@ -17,16 +19,40 @@ const Projeto = ({ title, description, date, alert }) => {
 };
 
 const ProjetosScreen = () => {
-  const projetos = [
-    {
-      id: 1,
-      title: 'Projeto 1',
-      description: 'Projeto para criar logotipo',
-      date: '17/10/2024',
-      alert: true,
-    },
-    // ... outros projetos
-  ];
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProjects = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "projetos"));
+      const projects = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      
+      //console.log("Projetos:", projects);
+      return projects; // Retorna os projetos
+    } catch (error) {
+      console.error("Erro ao buscar projetos:", error);
+    }
+  };
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchProjects();
+        //console.log("Projetos:", data);
+        setProjects(data);
+      } catch (error) {
+        Alert.alert("Erro", "Não foi possível carregar os projetos.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjects();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -35,7 +61,7 @@ const ProjetosScreen = () => {
         <TextInput style={styles.searchInput} placeholder="Pesquisar..." />
       </View>
       <FlatList
-        data={projetos}
+        data={projects}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <Projeto {...item} />}
       />

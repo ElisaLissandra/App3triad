@@ -30,7 +30,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Welcome">
+      <Stack.Navigator initialRouteName="ListProject">
         <Stack.Screen
           name="Welcome"
           component={Welcome}
@@ -39,14 +39,14 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen name="ListProject" component={ListProject} options={{ headerShown: false }} />
-       {/*  <Stack.Screen
+        <Stack.Screen
           name="RequestProject"
           component={RequestProject}
           options={{ headerShown: false }}
-        /> */}
+        />
         
         {/* Protegendo a rota RequestProject */}
-        <Stack.Screen
+        {/* <Stack.Screen
           name="RequestProject"
           options={{ headerShown: false }}
         >
@@ -55,7 +55,7 @@ export default function App() {
               <RequestProject />
             </ProtectedRoute>
           )}
-        </Stack.Screen>
+        </Stack.Screen> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
