@@ -13,10 +13,10 @@ import {
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { db, storage } from "../../../firebase-config"; // Importando o Firestore e o Storage
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
 import styles from "./styles";
 
 const RequestProject = () => {
@@ -54,7 +54,6 @@ const RequestProject = () => {
   }, []);
 
   const toggleSwitch = () => setUrgent((previousState) => !previousState);
-
 
   /* const handleFileUpload = async () => {
     try {
@@ -141,42 +140,38 @@ const RequestProject = () => {
       console.log("Erro ao anexar arquivo:", error.message);
     }
   };
-  
+
   const handleSubmit = async () => {
     if (!title || !description || !generalContext || !deadline) {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
-  
+
     try {
-      // Obtenha o usuário autenticado
       const auth = getAuth();
       const currentUser = auth.currentUser;
-  
+
       if (!currentUser) {
         Alert.alert("Erro", "Nenhum usuário autenticado.");
         return;
       }
-  
+
       let fileUrl = ""; // Variável para armazenar a URL do arquivo
-  
+
       if (fileUri) {
         try {
           console.log("Iniciando upload do arquivo:", fileUri);
-  
-          // Ler o arquivo como base64
-          const base64 = await FileSystem.readAsStringAsync(fileUri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-  
-          // Criar um blob a partir do base64
-          const base64Response = await fetch(`data:image/jpeg;base64,${base64}`);
-          const blob = await base64Response.blob();
-  
+
+          // Ler o arquivo como blob
+          const response = await fetch(fileUri);
+          const blob = await response.blob(); // Transformando o arquivo em blob
+
           // Criar uma referência no Firebase Storage
           const storageRef = ref(storage, `uploads/${Date.now()}_${fileName}`);
-          await uploadBytes(storageRef, blob); // Enviar o arquivo para o Storage
-  
+
+          // Fazer o upload do blob diretamente
+          await uploadBytes(storageRef, blob); // Substitui o uso de uploadString
+
           // Obter a URL do arquivo após o upload
           fileUrl = await getDownloadURL(storageRef);
           console.log("Upload bem-sucedido. URL do arquivo:", fileUrl);
@@ -185,9 +180,9 @@ const RequestProject = () => {
           console.error("Erro ao fazer upload do arquivo:", uploadError);
         }
       }
-  
+
       // Adicionar dados ao Firestore
-      await addDoc(collection(db, "projetos"), {
+      await addDoc(collection(db, "project s"), {
         title,
         description,
         generalContext,
@@ -195,11 +190,11 @@ const RequestProject = () => {
         urgent,
         fileUrl,
         status: "pendente",
-        userId: currentUser.uid // Usando o UID do usuário autenticado
+        userId: currentUser.uid,
       });
-  
+
       Alert.alert("Sucesso", "Projeto enviado com sucesso!");
-  
+
       // Limpar campos do formulário após o envio
       setTitle("");
       setDescription("");
@@ -212,7 +207,6 @@ const RequestProject = () => {
       console.error("Erro ao enviar o projeto:", error);
     }
   };
-  
 
   return (
     <KeyboardAvoidingView
