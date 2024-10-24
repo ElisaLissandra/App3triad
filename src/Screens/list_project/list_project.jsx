@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  Switch
+  Switch,
+  Button
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase-config";
@@ -37,6 +38,15 @@ const ProjectScreen = () => {
     }
   };
 
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await auth.signOut(); // Chama o método de logout do Firebase
+    } catch (error) {
+      console.error("Erro ao sair:", error); // Trate erros aqui, se necessário
+    }
+  };
+
   useEffect(() => {
     const loadProjects = async () => {
       setLoading(true);
@@ -46,7 +56,6 @@ const ProjectScreen = () => {
           return;
         }
         const data = await fetchProjects();
-        console.log("Projetos", data);
         setProjects(data);
       } catch (error) {
         Alert.alert("Erro", "Não foi possível carregar os projetos.");
@@ -137,6 +146,7 @@ const ProjectScreen = () => {
           )}
         </ScrollView>
       )}
+       <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };
