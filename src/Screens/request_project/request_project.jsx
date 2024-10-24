@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { db, storage } from "../../../firebase-config"; // Importando o Firestore e o Storage
-import { collection, addDoc } from "firebase/firestore"; // Certifique-se de que essa importação está correta
+import { collection, addDoc } from "firebase/firestore"; 
+import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import * as FileSystem from 'expo-file-system';
 import styles from "./styles";
@@ -148,25 +149,34 @@ const RequestProject = () => {
     }
   
     try {
+      // Obtenha o usuário autenticado
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+  
+      if (!currentUser) {
+        Alert.alert("Erro", "Nenhum usuário autenticado.");
+        return;
+      }
+  
       let fileUrl = ""; // Variável para armazenar a URL do arquivo
   
       if (fileUri) {
         try {
           console.log("Iniciando upload do arquivo:", fileUri);
-          
+  
           // Ler o arquivo como base64
           const base64 = await FileSystem.readAsStringAsync(fileUri, {
             encoding: FileSystem.EncodingType.Base64,
           });
-      
+  
           // Criar um blob a partir do base64
           const base64Response = await fetch(`data:image/jpeg;base64,${base64}`);
           const blob = await base64Response.blob();
-      
+  
           // Criar uma referência no Firebase Storage
           const storageRef = ref(storage, `uploads/${Date.now()}_${fileName}`);
           await uploadBytes(storageRef, blob); // Enviar o arquivo para o Storage
-      
+  
           // Obter a URL do arquivo após o upload
           fileUrl = await getDownloadURL(storageRef);
           console.log("Upload bem-sucedido. URL do arquivo:", fileUrl);
@@ -185,6 +195,7 @@ const RequestProject = () => {
         urgent,
         fileUrl,
         status: "pendente",
+        userId: currentUser.uid // Usando o UID do usuário autenticado
       });
   
       Alert.alert("Sucesso", "Projeto enviado com sucesso!");

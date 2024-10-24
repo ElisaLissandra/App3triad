@@ -12,25 +12,31 @@ const Stack = createNativeStackNavigator();
 
 // Componente para verificar se o usuário está autenticado
 const ProtectedRoute = ({ user, children }) => {
-  return user ? children : <Login />; // Se não estiver logado, redireciona para a tela de login
+  return user ? children : <Login />; // Redireciona para Login se o usuário não estiver autenticado
 };
 
 export default function App() {
   const [user, setUser] = React.useState(null); // Estado para armazenar o usuário logado
+  const [isLoading, setIsLoading] = React.useState(true); // Controle de carregamento
 
   React.useEffect(() => {
     // Monitorando o estado de autenticação do Firebase
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user ? user : null); // Define o estado do usuário logado
+      setIsLoading(false); // Fim do carregamento
     });
 
     // Cleanup function para cancelar o monitoramento quando o componente desmontar
     return () => unsubscribe();
   }, []);
 
+  if (isLoading) {
+    return null; // Ou pode mostrar um spinner enquanto verifica a autenticação
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="ListProject">
+      <Stack.Navigator initialRouteName={user ? "ListProject" : "Welcome"}>
         <Stack.Screen
           name="Welcome"
           component={Welcome}
@@ -38,15 +44,20 @@ export default function App() {
         />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
-        <Stack.Screen name="ListProject" component={ListProject} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="RequestProject"
-          component={RequestProject}
-          options={{ headerShown: false }}
-        />
         
-        {/* Protegendo a rota RequestProject */}
-        {/* <Stack.Screen
+        {/* Protegendo as rotas */}
+        <Stack.Screen
+          name="ListProject"
+          options={{ headerShown: false }}
+        >
+          {() => (
+            <ProtectedRoute user={user}>
+              <ListProject />
+            </ProtectedRoute>
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen
           name="RequestProject"
           options={{ headerShown: false }}
         >
@@ -55,7 +66,7 @@ export default function App() {
               <RequestProject />
             </ProtectedRoute>
           )}
-        </Stack.Screen> */}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
