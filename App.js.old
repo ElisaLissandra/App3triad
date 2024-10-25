@@ -1,38 +1,93 @@
-import React, { useEffect } from 'react';
-import { Button, View, StyleSheet } from 'react-native';
-import * as Google from 'expo-auth-session/providers/google';
-import { makeRedirectUri } from 'expo-auth-session';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Welcome from './src/Screens/welcome/welcome';
+import Login from './src/Auth/login/login';
+import Register from './src/Auth/register/register';
+import RequestProject from './src/Screens/request_project/request_project';
+import ListProject from './src/Screens/list_project/list_project';
+import { auth } from './firebase-config';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './firebase-config';
+
+const Stack = createNativeStackNavigator();
+
+// Componente para verificar se o usuário está autenticado
+const ProtectedRoute = ({ user, children }) => {
+  return user ? children : <Login />; // Redireciona para Login se o usuário não estiver autenticado
+};
 
 export default function App() {
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: '1087113360046-ge3sm56ppgi7crg68qfjj64fbunfolvc.apps.googleusercontent.com',
-    redirectUri: makeRedirectUri({
-      useProxy: true,
-    }),
-  });
+  const [user, setUser] = React.useState(null); // Estado para armazenar o usuário logado
+  const [isLoading, setIsLoading] = React.useState(true); // Controle de carregamento
+  const [initialRoute, setInitialRoute] = React.useState("Welcome");
 
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      console.log('Authentication:', authentication);
-      // Aqui você pode usar a autenticação para fazer login no Firebase ou em outro serviço
-    } else if (response?.type === 'error') {
-      console.log('Error during authentication:', response.error);
-    }
-  }, [response]);
+
+  // Função para verificar se o usuário possui projetos
+  const checkUserProjects = async (userId) => {
+    const querySnapshot = await getDocs(collection(db, "projetos"));
+    const userProjects = querySnapshot.docs.filter(doc => doc.data().userId === userId);
+    console.log("User Projects:", userProjects); // Verifique se os projetos do usuário estão sendo retornados corretamente
+    return userProjects.length > 0;
+  };
+  
+
+  React.useEffect(() => {
+    // Monitorando o estado de autenticação do Firebase
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      setUser(user ? user : null); // Define o estado do usuário logado
+      setIsLoading(false); // Fim do carregamento
+
+      if (user) {
+        const hasProjects = await checkUserProjects(user.uid); // Verifica se o usuário possui projetos
+        setInitialRoute(hasProjects ? "ListProject" : "RequestProject"); // Define a rota inicial com base nos projetos
+      } else {
+        setInitialRoute("Login"); // Redireciona para Login se não houver usuário
+      }
+    });
+
+    // Cleanup function para cancelar o monitoramento quando o componente desmontar
+    return () => unsubscribe();
+  }, []);
+
+  if (isLoading) {
+    return null; // Ou pode mostrar um spinner enquanto verifica a autenticação
+  }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button
-        title="Entrar com o Google"
-        onPress={() => promptAsync()}
-      />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName={initialRoute}>
+        <Stack.Screen
+          name="Welcome"
+          component={Welcome}
+          options={{ headerShown: false }} // Oculta o cabeçalho
+        />
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+        
+        {/* Protegendo as rotas */}
+        <Stack.Screen
+          name="ListProject"
+          options={{ headerShown: false }}
+        >
+          {() => (
+            <ProtectedRoute user={user}>
+              <ListProject />
+            </ProtectedRoute>
+          )}
+        </Stack.Screen>
+
+        <Stack.Screen
+          name="RequestProject"
+          options={{ headerShown: false }}
+        >
+          {() => (
+            <ProtectedRoute user={user}>
+              <RequestProject />
+            </ProtectedRoute>
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

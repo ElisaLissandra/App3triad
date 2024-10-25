@@ -54,7 +54,7 @@ const LoginScreen = () => {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log('Usuário autenticado com sucesso:', user);
-        navigation.navigate("RequestProject");
+        navigation.navigate("ListProject");
       })
       .catch((error) => {
        const errorCode = error.code;

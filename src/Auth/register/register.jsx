@@ -85,6 +85,7 @@ const RegisterScreen = () => {
         birthDate,
         contact,
         createdAt: new Date(),
+        role: "user", // Default role is "user"
       };
 
       // Save user data to Firestore

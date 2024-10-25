@@ -14,6 +14,7 @@ import { db } from "../../../firebase-config";
 import { auth } from "../../../firebase-config";
 import { FontAwesome5 } from "@expo/vector-icons";
 import styles from "./styles";
+import { useNavigation } from "@react-navigation/native";
 
 const ProjectScreen = () => {
   const [projects, setProjects] = useState([]);
@@ -21,17 +22,18 @@ const ProjectScreen = () => {
   const [searchText, setSearchText] = useState("");
   const [showUrgentOnly, setShowUrgentOnly] = useState(false);
   const currentUser = auth.currentUser; // Obtém o usuário logado
+  const navigation = useNavigation();
 
   const fetchProjects = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "projetos"));
+      const querySnapshot = await getDocs(collection(db, "projects"));
 
       const projects = querySnapshot.docs
         .map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }))
-        .filter((projeto) => projeto.userId === currentUser.uid);
+        .filter((project) => project.userId === currentUser.uid);
       return projects;
     } catch (error) {
       console.error("Erro ao buscar projetos:", error);
@@ -45,6 +47,11 @@ const ProjectScreen = () => {
     } catch (error) {
       console.error("Erro ao sair:", error); // Trate erros aqui, se necessário
     }
+  };
+
+
+  const handleRequestProject = () => {
+    navigation.navigate("RequestProject"); // Redireciona para a tela de solicitação de projeto
   };
 
   useEffect(() => {
@@ -108,6 +115,7 @@ const ProjectScreen = () => {
       </View>
 
       {/* Carregando projetos */}
+      
       {loading ? (
         <Text style={styles.loadingText}>Carregando projetos...</Text>
       ) : (
@@ -116,11 +124,9 @@ const ProjectScreen = () => {
             filteredProjects.map((projeto) => (
               <View key={projeto.id} style={styles.projectContainer}>
                 <View style={styles.projectContent}>
-                  {/* Ícone de usuário dentro de um círculo */}
                   <View style={styles.iconCircle}>
                     <FontAwesome5 name="user-alt" size={30} color="#303030" />
                   </View>
-
                   <View style={styles.projectDetails}>
                     <Text style={styles.projectTitle}>{projeto.title}</Text>
                     <Text style={styles.projectDescription}>
@@ -128,8 +134,6 @@ const ProjectScreen = () => {
                     </Text>
                     <Text style={styles.projectDate}>{projeto.deadline}</Text>
                   </View>
-
-                  {/* Exibindo o ícone de alerta apenas se 'urgent' for true */}
                   {projeto.urgent && (
                     <FontAwesome5
                       name="exclamation-triangle"
@@ -142,11 +146,14 @@ const ProjectScreen = () => {
               </View>
             ))
           ) : (
-            <Text style={styles.noResultsText}>Nenhum projeto encontrado.</Text>
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>Nenhum projeto encontrado.</Text>
+              <Button title="Solicitar Projeto" onPress={handleRequestProject} />
+            </View>
           )}
         </ScrollView>
       )}
-       <Button title="Logout" onPress={handleLogout} />
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };
