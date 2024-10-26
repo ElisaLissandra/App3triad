@@ -18,6 +18,9 @@ import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import * as FileSystem from "expo-file-system";
 import styles from "./styles";
+import NavigationBar from "../../Components/NavBar/Navbar";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const RequestProject = () => {
   const [urgent, setUrgent] = useState(false);
@@ -30,6 +33,7 @@ const RequestProject = () => {
   const [fileSize, setFileSize] = useState("");
   const [fileDate, setFileDate] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const navigation = useNavigation();
 
   // Listen for keyboard show/hide events
   useEffect(() => {
@@ -208,6 +212,10 @@ const RequestProject = () => {
     }
   };
 
+  const handleListProject = () => {
+    navigation.navigate("ListProject");
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -216,7 +224,14 @@ const RequestProject = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <Text style={styles.title}>Explique sobre seu projeto</Text>
+          <View style={styles.headerContainer}>
+            <TouchableOpacity
+              onPress={handleListProject}
+            >
+              <FontAwesome5 name="chevron-left" size={24} color="#0097B2" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Explique sobre seu projeto</Text>
+          </View>
 
           {/* Project Title */}
           <Text style={styles.label}>Título do Projeto</Text>
@@ -301,6 +316,7 @@ const RequestProject = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <NavigationBar />
     </KeyboardAvoidingView>
   );
 };

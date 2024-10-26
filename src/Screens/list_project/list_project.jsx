@@ -15,6 +15,7 @@ import { auth } from "../../../firebase-config";
 import { FontAwesome5 } from "@expo/vector-icons";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import NavigationBar from "../../Components/NavBar/Navbar";
 
 const ProjectScreen = () => {
   const [projects, setProjects] = useState([]);
@@ -146,14 +147,17 @@ const ProjectScreen = () => {
               </View>
             ))
           ) : (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsText}>Nenhum projeto encontrado.</Text>
-              <Button title="Solicitar Projeto" onPress={handleRequestProject} />
-            </View>
+            <TouchableOpacity
+            style={styles.requestProject}
+            onPress={handleRequestProject}
+          >
+            <Text style={styles.requestProjectButtonText}>Solicitar Projeto</Text>
+          </TouchableOpacity>
           )}
         </ScrollView>
       )}
-      <Button title="Logout" onPress={handleLogout} />
+      {/* <Button title="Logout" onPress={handleLogout} /> */}
+      <NavigationBar/>
     </View>
   );
 };

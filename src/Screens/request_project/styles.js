@@ -16,6 +16,18 @@ const styles = StyleSheet.create({
     padding: 20, 
     justifyContent: 'flex-start',
   },
+  headerContainer: {
+    marginTop: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20, // Ajuste conforme necessário
+  },
+  title: {
+    fontSize: 18, // Ajuste conforme necessário
+    fontWeight: 'bold',
+    marginLeft: 70, // Adiciona espaço entre o ícone e o título
+  },
+  /*
   title: {
     fontSize: 18,
     fontWeight: "bold",
@@ -23,7 +35,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#1E1E1E",
     marginTop: 30,
-  },
+  }, */
   label: {
     fontSize: 14,
     marginBottom: 5,
@@ -94,7 +106,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 25,
-    marginTop: 10,
+   /*  marginTop: 5, */
+    marginBottom: 50,
   },
   submitButtonText: {
     color: "#fff",
