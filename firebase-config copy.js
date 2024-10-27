@@ -2,9 +2,10 @@ import { initializeApp } from "firebase/app";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import 'firebase/compat/firestore';
+import { getStorage, ref} from "firebase/storage";
 
-// Configurações do Firebase
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAK96eMUCmQZAFqqhk6Hcejj9ZzrIRVkWo",
   authDomain: "triad-c44fc.firebaseapp.com",
@@ -14,22 +15,17 @@ const firebaseConfig = {
   appId: "1:815192260939:web:95a79ec9229864f74da8ce"
 };
 
-// Inicializa o Firebase apenas uma vez
-let app, auth;
-
-if (!app) {
-  app = initializeApp(firebaseConfig);
-}
-
-// Inicialize o Firestore e Storage
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+// Inicialize o Firestore
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Inicialize o Auth com AsyncStorage para persistência apenas se não estiver inicializado
-if (!auth) {
-  auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage)
-  });
-}
+// Inicialize o Auth com AsyncStorage para persistência
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage) // Certifique-se de que AsyncStorage está sendo usado aqui
+});
 
-export { auth };
+
+
+// Android: 815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com
