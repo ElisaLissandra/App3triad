@@ -83,12 +83,15 @@ const RequestProject = () => {
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const file = result.assets[0];
         const allowedTypes = ["application/pdf", "image/png", "image/jpeg"];
-  
+
         if (!allowedTypes.includes(file.mimeType)) {
-          Alert.alert("Erro", "Somente arquivos PDF, PNG ou JPG são permitidos.");
+          Alert.alert(
+            "Erro",
+            "Somente arquivos PDF, PNG ou JPG são permitidos."
+          );
           return;
         }
-  
+
         const newFile = {
           uri: file.uri,
           name: file.name,
@@ -105,7 +108,6 @@ const RequestProject = () => {
       console.log("Erro ao anexar arquivo:", error.message);
     }
   };
-  
 
   const handleSubmit = async () => {
     if (!title || !description || !generalContext || !deadline) {
@@ -171,7 +173,10 @@ const RequestProject = () => {
       behavior={Platform.OS === "android" ? "padding" : "height"}
       keyboardVerticalOffset={20}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <TouchableOpacity onPress={handleListProject}>
@@ -203,7 +208,7 @@ const RequestProject = () => {
           />
 
           {/* File Upload Placeholder */}
-          <Text style={styles.label}>Anexar arquivos</Text>
+          {/* <Text style={styles.label}>Anexar arquivos</Text>
           <TouchableOpacity
             style={styles.fileUploadButton}
             onPress={handleFileUpload}
@@ -211,15 +216,48 @@ const RequestProject = () => {
             <Text style={styles.buttonText}>Anexar arquivo</Text>
           </TouchableOpacity>
 
-          {/* Display File Details */}
-
           {files.map((file, index) => (
             <View key={index} style={styles.fileDetailsContainer}>
               <Text style={styles.fileDetail}>Nome: {file.name}</Text>
               <Text style={styles.fileDetail}>Tamanho: {(file.size / 1024).toFixed(2)} KB</Text>
               <Text style={styles.fileDetail}>Data: {file.date}</Text>
             </View>
-          ))} 
+          ))}  */}
+
+          <View style={styles.container}>
+            {/* Botão para upload de arquivo */}
+            <TouchableOpacity
+              style={styles.fileUploadButton}
+              onPress={handleFileUpload}
+            >
+              <FontAwesome5 name="paperclip" size={16} color="#ffffff" />
+              <Text style={styles.buttonText}>Anexar arquivo</Text>
+            </TouchableOpacity>
+
+            {/* Exibição dos detalhes do arquivo */}
+            {files.map((file, index) => (
+              <View key={index} style={styles.fileDetailsContainer}>
+                <FontAwesome5
+                  name="file-alt"
+                  size={16}
+                  color="#5a5a5a"
+                  style={styles.fileIcon}
+                />
+                <Text style={styles.fileDetail}>{file.name}</Text>
+                <Text style={styles.fileSize}>
+                  {(file.size / 1024).toFixed(2)} KB
+                </Text>
+                <TouchableOpacity onPress={() => handleRemoveFile(index)}>
+                  <FontAwesome5
+                    name="trash-alt"
+                    size={16}
+                    color="#ED1515"
+                    style={styles.trashIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
 
           {/* General Project Context */}
           <Text style={styles.label}>Contexto geral do projeto</Text>
