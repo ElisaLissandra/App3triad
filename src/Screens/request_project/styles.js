@@ -106,8 +106,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 25,
-   /*  marginTop: 5, */
-    marginBottom: 50,
+    marginTop: 5, 
   },
   submitButtonText: {
     color: "#fff",

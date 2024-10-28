@@ -27,7 +27,10 @@ const RequestProject = () => {
   const [description, setDescription] = useState("");
   const [generalContext, setGeneralContext] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [files, setFiles] = useState([]);
+  const [fileUri, setFileUri] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [fileSize, setFileSize] = useState("");
+  const [fileDate, setFileDate] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navigation = useNavigation();
 
@@ -55,57 +58,24 @@ const RequestProject = () => {
 
   const toggleSwitch = () => setUrgent((previousState) => !previousState);
 
-  /* const handleFileUpload = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({});
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
-        const newFile = {
-          uri: file.uri,
-          name: file.name,
-          size: file.size,
-          date: new Date(file.modificationTime).toLocaleDateString(),
-        };
-        setFiles((prevFiles) => [...prevFiles, newFile]); // Adiciona o arquivo à lista
-        Alert.alert("Arquivo anexado:", file.name);
-      } else {
-        Alert.alert("Nenhum arquivo selecionado.");
-      }
-    } catch (error) {
-      Alert.alert("Erro ao anexar arquivo:", error.message);
-      console.log("Erro ao anexar arquivo:", error.message);
-    }
-  }; */
-
   const handleFileUpload = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({});
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
-        const allowedTypes = ["application/pdf", "image/png", "image/jpeg"];
-  
-        if (!allowedTypes.includes(file.mimeType)) {
-          Alert.alert("Erro", "Somente arquivos PDF, PNG ou JPG são permitidos.");
-          return;
+        const result = await DocumentPicker.getDocumentAsync({});
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            const file = result.assets[0]; // Access the first file
+            setFileUri(file.uri);
+            setFileName(file.name);
+            setFileSize(file.size);
+            setFileDate(new Date(file.modificationTime).toLocaleDateString());
+            Alert.alert("Arquivo anexado:", file.name);
+        } else {
+            Alert.alert("Nenhum arquivo selecionado.");
         }
-  
-        const newFile = {
-          uri: file.uri,
-          name: file.name,
-          size: file.size,
-          date: new Date(file.modificationTime).toLocaleDateString(),
-        };
-        setFiles((prevFiles) => [...prevFiles, newFile]); // Adiciona o arquivo à lista
-        Alert.alert("Arquivo anexado:", file.name);
-      } else {
-        Alert.alert("Nenhum arquivo selecionado.");
-      }
     } catch (error) {
-      Alert.alert("Erro ao anexar arquivo:", error.message);
-      console.log("Erro ao anexar arquivo:", error.message);
+        Alert.alert("Erro ao anexar arquivo:", error.message);
+        console.log("Erro ao anexar arquivo:", error.message);
     }
-  };
-  
+};
 
   const handleSubmit = async () => {
     if (!title || !description || !generalContext || !deadline) {
@@ -122,39 +92,52 @@ const RequestProject = () => {
         return;
       }
 
-      const uploadedFileUrls = [];
-      for (const file of files) {
+      let fileUrl = ""; // Variável para armazenar a URL do arquivo
+
+      if (fileUri) {
         try {
-          const response = await fetch(file.uri);
-          const blob = await response.blob();
-          const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
-          await uploadBytes(storageRef, blob);
-          const fileUrl = await getDownloadURL(storageRef);
-          uploadedFileUrls.push({ name: file.name, url: fileUrl });
+          console.log("Iniciando upload do arquivo:", fileUri);
+
+          // Ler o arquivo como blob
+          const response = await fetch(fileUri);
+          const blob = await response.blob(); // Transformando o arquivo em blob
+
+          // Criar uma referência no Firebase Storage
+          const storageRef = ref(storage, `uploads/${Date.now()}_${fileName}`);
+
+          // Fazer o upload do blob diretamente
+          await uploadBytes(storageRef, blob); // Substitui o uso de uploadString
+
+          // Obter a URL do arquivo após o upload
+          fileUrl = await getDownloadURL(storageRef);
+          console.log("Upload bem-sucedido. URL do arquivo:", fileUrl);
         } catch (uploadError) {
-          Alert.alert("Erro ao fazer upload de arquivo", uploadError.message);
-          console.error("Erro ao fazer upload de arquivo:", uploadError);
+          Alert.alert("Erro ao fazer upload do arquivo", uploadError.message);
+          console.error("Erro ao fazer upload do arquivo:", uploadError);
         }
       }
 
+      // Adicionar dados ao Firestore
       await addDoc(collection(db, "projects"), {
         title,
         description,
         generalContext,
         deadline,
         urgent,
-        files: uploadedFileUrls, // Lista de URLs dos arquivos
+        fileUrl,
         status: "pendente",
         userId: currentUser.uid,
       });
 
       Alert.alert("Sucesso", "Projeto enviado com sucesso!");
+
+      // Limpar campos do formulário após o envio
       setTitle("");
       setDescription("");
       setGeneralContext("");
       setDeadline("");
       setUrgent(false);
-      setFiles([]);
+      setFileUri(null);
     } catch (error) {
       Alert.alert("Erro ao enviar o projeto", error.message);
       console.error("Erro ao enviar o projeto:", error);
@@ -174,7 +157,9 @@ const RequestProject = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={handleListProject}>
+            <TouchableOpacity
+              onPress={handleListProject}
+            >
               <FontAwesome5 name="chevron-left" size={24} color="#0097B2" />
             </TouchableOpacity>
             <Text style={styles.title}>Explique sobre seu projeto</Text>
@@ -212,14 +197,15 @@ const RequestProject = () => {
           </TouchableOpacity>
 
           {/* Display File Details */}
-
-          {files.map((file, index) => (
-            <View key={index} style={styles.fileDetailsContainer}>
-              <Text style={styles.fileDetail}>Nome: {file.name}</Text>
-              <Text style={styles.fileDetail}>Tamanho: {(file.size / 1024).toFixed(2)} KB</Text>
-              <Text style={styles.fileDetail}>Data: {file.date}</Text>
+          {fileUri && (
+            <View style={styles.fileDetailsContainer}>
+              <Text style={styles.fileDetail}>Nome: {fileName}</Text>
+              <Text style={styles.fileDetail}>
+                Tamanho: {(fileSize / 1024).toFixed(2)} KB
+              </Text>
+              <Text style={styles.fileDetail}>Data: {fileDate}</Text>
             </View>
-          ))} 
+          )}
 
           {/* General Project Context */}
           <Text style={styles.label}>Contexto geral do projeto</Text>
@@ -262,6 +248,7 @@ const RequestProject = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <NavigationBar />
     </KeyboardAvoidingView>
   );
 };

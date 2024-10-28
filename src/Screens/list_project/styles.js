@@ -7,11 +7,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
   },
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+  headerContainer: {
+    marginTop: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', 
     marginBottom: 20,
-    textAlign: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,  
+    marginRight: -24, 
+  }, 
+  scrollContainer: {
+    flex: 1, // Adiciona flexibilidade
+    marginBottom: 20, // Espaço abaixo do ScrollView
   },
   searchContainer: {
     flexDirection: "row",
@@ -108,6 +120,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  addButton: {
+    position: "absolute",
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 20, 
+    right: 20, 
+    width: 60,
+    height: 60,
+    backgroundColor: "#0097B2", 
+    borderRadius: 30, 
+    padding: 10,
+    elevation: 5, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3.5,
   },
 
 });

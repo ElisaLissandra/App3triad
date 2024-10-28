@@ -7,7 +7,7 @@ import {
   Alert,
   ScrollView,
   Switch,
-  Button
+  Button,
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase-config";
@@ -49,7 +49,6 @@ const ProjectScreen = () => {
       console.error("Erro ao sair:", error); // Trate erros aqui, se necessário
     }
   };
-
 
   const handleRequestProject = () => {
     navigation.navigate("RequestProject"); // Redireciona para a tela de solicitação de projeto
@@ -93,7 +92,12 @@ const ProjectScreen = () => {
   return (
     <View style={styles.container}>
       {/* Título da página */}
-      <Text style={styles.pageTitle}>Projetos</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Projetos</Text>
+        <TouchableOpacity>
+          <FontAwesome5 name="cog" size={24} color="#bfbfbf" />
+        </TouchableOpacity>
+      </View>
 
       {/* Barra de pesquisa */}
       <View style={styles.searchContainer}>
@@ -116,48 +120,66 @@ const ProjectScreen = () => {
       </View>
 
       {/* Carregando projetos */}
-      
-      {loading ? (
-        <Text style={styles.loadingText}>Carregando projetos...</Text>
-      ) : (
-        <ScrollView style={styles.projectsListContainer}>
-          {filteredProjects.length > 0 ? (
-            filteredProjects.map((projeto) => (
-              <View key={projeto.id} style={styles.projectContainer}>
-                <View style={styles.projectContent}>
-                  <View style={styles.iconCircle}>
-                    <FontAwesome5 name="user-alt" size={30} color="#303030" />
-                  </View>
-                  <View style={styles.projectDetails}>
-                    <Text style={styles.projectTitle}>{projeto.title}</Text>
-                    <Text style={styles.projectDescription}>
-                      {projeto.description}
-                    </Text>
-                    <Text style={styles.projectDate}>{projeto.deadline}</Text>
-                  </View>
-                  {projeto.urgent && (
-                    <FontAwesome5
-                      name="exclamation-triangle"
-                      size={20}
-                      color="#E74C3C"
-                      style={styles.alertIcon}
-                    />
-                  )}
-                </View>
-              </View>
-            ))
+      <View style={styles.scrollContainer}>
+        <ScrollView
+          style={styles.projectsListContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {loading ? (
+            <Text style={styles.loadingText}>Carregando projetos...</Text>
           ) : (
-            <TouchableOpacity
-            style={styles.requestProject}
-            onPress={handleRequestProject}
-          >
-            <Text style={styles.requestProjectButtonText}>Solicitar Projeto</Text>
-          </TouchableOpacity>
+            <View>
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((projeto) => (
+                  <View key={projeto.id} style={styles.projectContainer}>
+                    <View style={styles.projectContent}>
+                      <View style={styles.iconCircle}>
+                        <FontAwesome5
+                          name="user-alt"
+                          size={30}
+                          color="#303030"
+                        />
+                      </View>
+                      <View style={styles.projectDetails}>
+                        <Text style={styles.projectTitle}>{projeto.title}</Text>
+                        <Text style={styles.projectDescription}>
+                          {projeto.description}
+                        </Text>
+                        <Text style={styles.projectDate}>
+                          {projeto.deadline}
+                        </Text>
+                      </View>
+                      {projeto.urgent && (
+                        <FontAwesome5
+                          name="exclamation-triangle"
+                          size={20}
+                          color="#E74C3C"
+                          style={styles.alertIcon}
+                        />
+                      )}
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <TouchableOpacity
+                  style={styles.requestProject}
+                  onPress={handleRequestProject}
+                >
+                  <Text style={styles.requestProjectButtonText}>
+                    Solicitar Projeto
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </ScrollView>
-      )}
+      </View>
+      {/* Botão flutuante para adicionar projetos */}
+      <TouchableOpacity style={styles.addButton} onPress={handleRequestProject}>
+        <FontAwesome5 name="plus" size={24} color="#ffffff" />
+      </TouchableOpacity>
+
       {/* <Button title="Logout" onPress={handleLogout} /> */}
-      <NavigationBar/>
     </View>
   );
 };
