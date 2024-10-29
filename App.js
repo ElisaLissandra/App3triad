@@ -6,6 +6,7 @@ import Login from './src/Auth/login/login';
 import Register from './src/Auth/register/register';
 import RequestProject from './src/Screens/request_project/request_project';
 import ListProject from './src/Screens/list_project/list_project';
+import DetailsProject from './src/Screens/details_project/details_project';
 import { auth } from './firebase-config';
 
 const Stack = createNativeStackNavigator();
@@ -67,6 +68,16 @@ export default function App() {
           {() => (
             <ProtectedRoute user={user}>
               <RequestProject />
+            </ProtectedRoute>
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="DetailsProject"
+          options={{ headerShown: false }}
+        >
+          {() => (
+            <ProtectedRoute user={user}>
+              <DetailsProject />
             </ProtectedRoute>
           )}
         </Stack.Screen>

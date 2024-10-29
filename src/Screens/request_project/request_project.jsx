@@ -96,7 +96,6 @@ const RequestProject = () => {
           uri: file.uri,
           name: file.name,
           size: file.size,
-          date: new Date(file.modificationTime).toLocaleDateString(),
         };
         setFiles((prevFiles) => [...prevFiles, newFile]); // Adiciona o arquivo à lista
         Alert.alert("Arquivo anexado:", file.name);
@@ -108,6 +107,12 @@ const RequestProject = () => {
       console.log("Erro ao anexar arquivo:", error.message);
     }
   };
+
+  const handleRemoveFile = (index) => {
+    const updatedFiles = files.filter((_, i) => i !== index);
+    setFiles(updatedFiles);
+  };
+
 
   const handleSubmit = async () => {
     if (!title || !description || !generalContext || !deadline) {

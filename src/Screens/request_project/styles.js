@@ -17,10 +17,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   headerContainer: {
-    marginTop: 30,
+    marginTop: 40,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20, 
+    marginBottom: 30, 
   },
   title: {
     fontSize: 18, 
@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 25,
-    marginTop: 5, 
   },
   submitButtonText: {
     color: "#fff",

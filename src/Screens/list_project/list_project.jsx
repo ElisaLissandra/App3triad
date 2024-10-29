@@ -24,21 +24,25 @@ const ProjectScreen = () => {
   const navigation = useNavigation();
 
   const fetchProjects = () => {
-    const unsubscribe = onSnapshot(collection(db, "projects"), (querySnapshot) => {
-      const projectsData = querySnapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((project) => project.userId === currentUser.uid);
-      
-      setProjects(projectsData);
-      setLoading(false); // Define loading como false após carregar os dados
-    }, (error) => {
-      console.error("Erro ao escutar projetos:", error);
-      Alert.alert("Erro", "Não foi possível carregar os projetos.");
-      setLoading(false); // Define loading como false mesmo em caso de erro
-    });
+    const unsubscribe = onSnapshot(
+      collection(db, "projects"),
+      (querySnapshot) => {
+        const projectsData = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter((project) => project.userId === currentUser.uid);
+
+        setProjects(projectsData);
+        setLoading(false); // Define loading como false após carregar os dados
+      },
+      (error) => {
+        console.error("Erro ao escutar projetos:", error);
+        Alert.alert("Erro", "Não foi possível carregar os projetos.");
+        setLoading(false); // Define loading como false mesmo em caso de erro
+      }
+    );
 
     return unsubscribe;
   };
@@ -86,25 +90,50 @@ const ProjectScreen = () => {
       </View>
 
       <View style={styles.scrollContainer}>
-        <ScrollView style={styles.projectsListContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.projectsListContainer}
+          showsVerticalScrollIndicator={false}
+        >
           {loading ? (
             <Text style={styles.loadingText}>Carregando projetos...</Text>
           ) : (
             <View>
               {filteredProjects.length > 0 ? (
-                filteredProjects.map((projeto) => (
-                  <View key={projeto.id} style={styles.projectContainer}>
+                filteredProjects.map((project) => (
+                  <View key={project.id} style={styles.projectContainer}>
                     <View style={styles.projectContent}>
                       <View style={styles.iconCircle}>
-                        <FontAwesome5 name="user-alt" size={30} color="#303030" />
+                        <FontAwesome5
+                          name="user-alt"
+                          size={30}
+                          color="#303030"
+                        />
                       </View>
                       <View style={styles.projectDetails}>
-                        <Text style={styles.projectTitle}>{projeto.title}</Text>
-                        <Text style={styles.projectDescription}>{projeto.description}</Text>
-                        <Text style={styles.projectDate}>{projeto.deadline}</Text>
+                        <Text style={styles.projectTitle}>{project.title}</Text>
+                        <Text style={styles.projectDescription}>
+                          {project.description}
+                        </Text>
+                        <Text style={styles.projectDate}>
+                          {project.deadline}
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.detailsButton}
+                          onPress={() =>
+                            navigation.navigate("DetailsProject", { project })
+                          }
+                        >
+                          <Text style={styles.detailsButtonText}>
+                            Ver Detalhes
+                          </Text>
+                        </TouchableOpacity>
                       </View>
-                      {projeto.urgent && (
-                        <FontAwesome5 name="exclamation-triangle" size={20} color="#E74C3C" />
+                      {project.urgent && (
+                        <FontAwesome5
+                          name="exclamation-triangle"
+                          size={20}
+                          color="#E74C3C"
+                        />
                       )}
                     </View>
                   </View>
@@ -114,7 +143,9 @@ const ProjectScreen = () => {
                   style={styles.requestProject}
                   onPress={() => navigation.navigate("RequestProject")}
                 >
-                  <Text style={styles.requestProjectButtonText}>Solicitar Projeto</Text>
+                  <Text style={styles.requestProjectButtonText}>
+                    Solicitar Projeto
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -123,7 +154,10 @@ const ProjectScreen = () => {
       </View>
 
       {/* Botão flutuante para adicionar projetos */}
-      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("RequestProject")}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate("RequestProject")}
+      >
         <FontAwesome5 name="plus" size={24} color="#ffffff" />
       </TouchableOpacity>
 
