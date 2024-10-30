@@ -1,37 +1,41 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 const DetailsProjectScreen = () => {
-  const files = [
-    { name: "Nome_arquivo.pdf", size: "150 KB", date: "10/10/2024" },
-    { name: "Nome_arquivo.pdf", size: "150 KB", date: "10/10/2024" },
-    { name: "Nome_arquivo.pdf", size: "150 KB", date: "10/10/2024" },
-  ];
+  const route = useRoute();
+  const { project } = route.params;
+  const { title, description, generalContext, deadline, urgent, status, files = [] } = project;
+
+  console.log("Datelhes projeto", project);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
-      <Text style={styles.header}>Projeto 1</Text>
+      <Text style={styles.header}>{title}</Text>
 
       {/* Section de arquivos */}
       <Text style={styles.subHeader}>Baixa arquivo</Text>
-      {files.map((file, index) => (
-        <View key={index} style={styles.fileContainer}>
-          <View style={styles.fileInfo}>
-            <Text style={styles.fileName}>{file.name}</Text>
-            <Text style={styles.fileDetails}>{file.size} {file.date}</Text>
+      {Array.isArray(files) && files.length > 0 ? (
+        files.map((file, index) => (
+          <View key={index} style={styles.fileContainer}>
+            <View style={styles.fileInfo}>
+              <Text style={styles.fileName}>{file.name}</Text>
+            </View>
+            <TouchableOpacity style={styles.downloadButton}>
+              <FontAwesome5 name="download" size={20} color="#3c3c3c" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.downloadButton}>
-            <FontAwesome5 name="download" size={20} color="#3c3c3c" />
-          </TouchableOpacity>
-        </View>
-      ))}
+        ))
+      ) : (
+        <Text>Nenhum arquivo disponível</Text>
+      )}
 
       {/* Data e status de urgência */}
       <View style={styles.dateContainer}>
         <MaterialIcons name="date-range" size={24} color="#1D9BF0" />
-        <Text style={styles.dateText}>17/10/2024</Text>
+        <Text style={styles.dateText}>{deadline}</Text>
         <View style={styles.urgentContainer}>
           <Text style={styles.urgentText}>Urgente</Text>
           <MaterialIcons name="error" size={24} color="#FF3B30" />
@@ -41,13 +45,13 @@ const DetailsProjectScreen = () => {
       {/* Descrição do projeto */}
       <Text style={styles.sectionTitle}>Descrição do projeto</Text>
       <Text style={styles.descriptionText}>
-        Preciso desenvolver uma logotipo para incluir nas minhas peças que vão para as redes sociais, possuo paleta de cores.
+        {description}
       </Text>
 
       {/* Contexto do projeto */}
       <Text style={styles.sectionTitle}>Contexto do projeto</Text>
       <Text style={styles.descriptionText}>
-        Preciso desenvolver uma logotipo para incluir nas minhas peças que vão para as redes sociais, possuo paleta de cores.
+       {generalContext}
       </Text>
 
       {/* Botão Acompanhar status */}

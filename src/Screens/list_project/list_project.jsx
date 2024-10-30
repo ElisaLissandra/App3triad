@@ -127,9 +127,7 @@ const ProjectScreen = () => {
                         <View style={styles.detailsUrgentContainer}>
                           <TouchableOpacity
                             style={styles.detailsButton}
-                            onPress={() =>
-                              navigation.navigate("DetailsProject", { project })
-                            }
+                            onPress={() => navigation.navigate("DetailsProject", { project })}
                           >
                             <Text style={styles.detailsButtonText}>
                               Ver Detalhes

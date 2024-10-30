@@ -20,6 +20,7 @@ import styles from "./styles";
 import NavigationBar from "../../Components/NavBar/Navbar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { TextInputMask } from "react-native-masked-text";
 
 const RequestProject = () => {
   const [urgent, setUrgent] = useState(false);
@@ -112,7 +113,6 @@ const RequestProject = () => {
     const updatedFiles = files.filter((_, i) => i !== index);
     setFiles(updatedFiles);
   };
-
 
   const handleSubmit = async () => {
     if (!title || !description || !generalContext || !deadline) {
@@ -276,9 +276,13 @@ const RequestProject = () => {
 
           {/* Deadline */}
           <Text style={styles.label}>Prazo para entrega</Text>
-          <TextInput
+          <TextInputMask
+            type={"datetime"}
+            options={{
+              format: "DD/MM/YYYY",
+            }}
             style={styles.input}
-            placeholder="00/00/0000"
+            placeholder="DD/MM/YYYY"
             value={deadline}
             onChangeText={setDeadline}
             keyboardType="numeric"
