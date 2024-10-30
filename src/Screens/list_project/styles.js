@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
     flex: 1,  
@@ -91,13 +91,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
-  projectDescription: {
+ /*  projectDescription: {
     color: "#0097B2",
     fontWeight: "bold",
     marginBottom: 5,
-  },
+  }, */
   projectDate: {
     color: "#888",
+    paddingVertical: 3,
+    fontSize:15,
   },
   alertIcon: {
     marginLeft: 10,
@@ -137,6 +139,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 3.5,
+  },
+  detailsButton: {
+    paddingVertical: 3,
+    borderRadius: 5,
+    marginTop: 5,
+    alignSelf: "flex-start",
+  },
+
+  detailsButtonText: {
+    color: "#0097B2", // Cor branca para o texto
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  detailsUrgentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  urgentIcon: {
+    marginLeft: 'auto', // Ajuste o espaçamento conforme necessário
   },
 
 });

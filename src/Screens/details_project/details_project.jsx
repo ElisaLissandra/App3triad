@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
-const DetailsProjectDetailsScreen = () => {
+const DetailsProjectScreen = () => {
   const files = [
     { name: "Nome_arquivo.pdf", size: "150 KB", date: "10/10/2024" },
     { name: "Nome_arquivo.pdf", size: "150 KB", date: "10/10/2024" },
