@@ -147,14 +147,7 @@ const ProjectScreen = () => {
                   </View>
                 ))
               ) : (
-                <TouchableOpacity
-                  style={styles.requestProject}
-                  onPress={() => navigation.navigate("RequestProject")}
-                >
-                  <Text style={styles.requestProjectButtonText}>
-                    Solicitar Projeto
-                  </Text>
-                </TouchableOpacity>
+                <Text style={styles.noProjectsText}>Nenhum projeto encontrado</Text>
               )}
             </View>
           )}

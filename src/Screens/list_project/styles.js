@@ -109,19 +109,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 200,
   },
-  requestProject: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#0097B2",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 25,
-    marginTop: 200,
-  },
-  requestProjectButtonText: {
-    color: "#fff",
+  noProjectsText: {
+    textAlign: "center",
     fontSize: 16,
-    fontWeight: "bold",
+    color: "#888", 
+    marginTop: 200,
   },
   addButton: {
     position: "absolute",
