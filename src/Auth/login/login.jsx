@@ -5,39 +5,36 @@ import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import {
   GoogleAuthProvider,
-  onAuthStateChanged,
   signInWithCredential,
 } from "firebase/auth";
-import { auth, db } from "../../../firebase-config"; // Ensure db is imported
+import { auth, db } from "../../../firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import {
   View,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
   TouchableOpacity,
   Alert,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
+import { doc, getDoc } from "firebase/firestore";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
-  const navigation = useNavigation(); // Obtendo a função de navegação
-
+  const navigation = useNavigation();
+  
   const handleRegister = () => {
-    navigation.navigate("Register"); // Navegando para a tela de Login
+    navigation.navigate("Register");
   };
 
-  const [userInfo, setUserInfo] = useState();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId:
-      "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
+    clientId: "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
     redirectUri: "https://auth.expo.io/@elisa_expo/App3triad",
   });
 
@@ -48,42 +45,37 @@ const LoginScreen = () => {
       signInWithCredential(auth, credential)
         .then((userCredential) => {
           const user = userCredential.user;
-          checkIfUserIsAdmin(user.uid); // Check if the user is an admin
+          checkIfUserIsAdmin(user.uid);
         })
         .catch((error) => {
           console.error("Erro ao autenticar com Google:", error);
         });
-    } else if (response?.type === "error") {
-      console.error("Erro de autenticação:", response.params);
     }
   }, [response]);
 
   const handleLogin = () => {
+    setErrorMessage("");
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        // Fetch additional user data from your database
         checkIfUserIsAdmin(user.uid);
       })
       .catch((error) => {
-        const errorMessage = error.message;
-        console.log(errorMessage);
+        setErrorMessage(getFriendlyErrorMessage(error.code));
       });
   };
 
   const checkIfUserIsAdmin = async (uid) => {
     try {
-      const userDocRef = doc(db, 'users', uid); // Reference to the user document
-      const userDoc = await getDoc(userDocRef); // Fetch the document
+      const userDocRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        // Check if the role is 'admin'
         if (userData.role === "admin") {
           console.log("Usuário é admin");
-          //navigation.navigate("AdminDashboard"); // Navigate to admin dashboard
+          //navigation.navigate("AdminDashboard");
         } else {
-          console.log("Usuário não é admin");
-          navigation.navigate("ListProject"); // Navigate to regular user dashboard
+          navigation.navigate("ListProject");
         }
       } else {
         console.log("Usuário não encontrado");
@@ -92,7 +84,23 @@ const LoginScreen = () => {
       console.error("Erro ao verificar admin:", error);
     }
   };
-  
+
+  const getFriendlyErrorMessage = (errorCode) => {
+    switch (errorCode) {
+      case "auth/invalid-credential":
+        return "O e-mail ou a senha fornecidos estão incorretos. Verifique e tente novamente.";
+      case "auth/user-disabled":
+        return "Esta conta foi desativada. Entre em contato com o suporte.";
+      case "auth/user-not-found":
+        return "Não encontramos uma conta com este e-mail.";
+      case "auth/wrong-password":
+        return "A senha está incorreta. Tente novamente.";
+      case "auth/too-many-requests":
+        return "Muitas tentativas de login. Tente novamente mais tarde.";
+      default:
+        return "Ocorreu um erro inesperado. Tente novamente.";
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -122,6 +130,7 @@ const LoginScreen = () => {
           />
         </TouchableOpacity>
       </View>
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       <Text style={styles.link}>Esqueceu a senha?</Text>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>

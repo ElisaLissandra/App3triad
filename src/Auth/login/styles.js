@@ -115,6 +115,15 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 10,
   },
+  errorText: {
+    color: "#d9534f",
+    fontSize: 14,
+    marginBottom: 15,
+    textAlign: "center",
+    alignSelf: "center",  
+    maxWidth: "80%",   
+  }
+  
 });
 
 
