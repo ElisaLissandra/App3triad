@@ -1,13 +1,15 @@
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Welcome from './src/Screens/welcome/welcome';
-import Login from './src/Auth/login/login';
-import Register from './src/Auth/register/register';
-import RequestProject from './src/Screens/request_project/request_project';
-import ListProject from './src/Screens/list_project/list_project';
-import DetailsProject from './src/Screens/details_project/details_project';
-import { auth } from './firebase-config';
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Welcome from "./src/Screens/welcome/welcome";
+import Login from "./src/Auth/login/login";
+import Register from "./src/Auth/register/register";
+import RequestProject from "./src/Screens/request_project/request_project";
+import ListProject from "./src/Screens/list_project/list_project";
+import DetailsProject from "./src/Screens/details_project/details_project";
+import StatusProject from "./src/Screens/status_project/status_project";
+import { auth } from "./firebase-config";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +22,7 @@ export default function App() {
   const [user, setUser] = React.useState(null); // Estado para armazenar o usuário logado
   const [isLoading, setIsLoading] = React.useState(true); // Controle de carregamento
   const [initialRoute, setInitialRoute] = React.useState("Welcome");
-  
+
   React.useEffect(() => {
     // Monitorando o estado de autenticação do Firebase
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -46,14 +48,19 @@ export default function App() {
           component={Welcome}
           options={{ headerShown: false }} // Oculta o cabeçalho
         />
-        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-        <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
-        
-        {/* Protegendo as rotas */}
         <Stack.Screen
-          name="ListProject"
+          name="Login"
+          component={Login}
           options={{ headerShown: false }}
-        >
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ headerShown: false }}
+        />
+
+        {/* Protegendo as rotas */}
+        <Stack.Screen name="ListProject" options={{ headerShown: false }}>
           {() => (
             <ProtectedRoute user={user}>
               <ListProject />
@@ -61,23 +68,24 @@ export default function App() {
           )}
         </Stack.Screen>
 
-        <Stack.Screen
-          name="RequestProject"
-          options={{ headerShown: false }}
-        >
+        <Stack.Screen name="RequestProject" options={{ headerShown: false }}>
           {() => (
             <ProtectedRoute user={user}>
               <RequestProject />
             </ProtectedRoute>
           )}
         </Stack.Screen>
-        <Stack.Screen
-          name="DetailsProject"
-          options={{ headerShown: false }}
-        >
+        <Stack.Screen name="DetailsProject" options={{ headerShown: false }}>
           {() => (
             <ProtectedRoute user={user}>
               <DetailsProject />
+            </ProtectedRoute>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="StatusProject" options={{ headerShown: false }}>
+          {() => (
+            <ProtectedRoute user={user}>
+              <StatusProject />
             </ProtectedRoute>
           )}
         </Stack.Screen>

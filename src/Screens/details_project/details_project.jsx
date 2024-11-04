@@ -9,10 +9,11 @@ import {
   Keyboard,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { db } from "../../../firebase-config";
 import { doc, getDoc } from "firebase/firestore";
+import styles from "./styles";
 
 const DetailsProjectScreen = () => {
   const route = useRoute();
@@ -66,6 +67,11 @@ const DetailsProjectScreen = () => {
   const handleListProject = () => {
     navigation.navigate("ListProject");
   };
+
+  const handleStatusProject = () => {
+    navigation.navigate("StatusProject", { project: project });
+  };
+  
 
   return (
     <KeyboardAvoidingView
@@ -148,161 +154,13 @@ const DetailsProjectScreen = () => {
           <Text style={styles.descriptionText}>{generalContext}</Text>
 
           {/* Botão Acompanhar status */}
-          <TouchableOpacity style={styles.statusButton}>
+          <TouchableOpacity style={styles.statusButton} onPress={handleStatusProject}>
             <Text style={styles.statusButtonText}>Acompanhar status</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
-
-const styles = {
-  /* container: {
-    padding: 20,
-    backgroundColor: "#ffffff",
-  },
-  titleProject: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  }, */
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    /* justifyContent: "center", */
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: "flex-start",
-  },
-  headerContainer: {
-    marginTop: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginLeft: 85,
-  },
-  titleProject: {
-    fontSize: 16,
-    color: "#8c8c8c",
-    marginBottom: 10,
-  },
-  /*  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  userInfo: {
-    fontSize: 16,
-    color: "#6c6c6c",
-    marginBottom: 5,
-  }, */
-  userInfoContainer: {
-    flexDirection: "row", // Alinha os filhos em linha
-    alignItems: "center", // Alinha verticalmente ao centro
-    /*  marginBottom: 5, */ // Adiciona um espaço abaixo
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold", // Estilo em negrito para o título
-    marginBottom: 0, // Remover margens desnecessárias
-    color: "#333", // Cor do título
-    lineHeight: 22, // Ajuste a altura da linha para centralizar verticalmente
-  },
-  userInfo: {
-    fontSize: 16,
-    color: "#6c6c6c",
-    marginLeft: 5,
-    /* lineHeight: 22, */
-    marginTop: 15,
-  },
-  subHeader: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#3c3c3c",
-    paddingVertical: 8,
-    marginTop: 10,
-    marginBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    backgroundColor: "#f9f9f9",
-    paddingHorizontal: 5,
-    borderRadius: 5,
-  },
-  fileContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#F0F0F0",
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  fileInfo: {
-    flexDirection: "column",
-  },
-  fileName: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  fileDetails: {
-    fontSize: 14,
-    color: "#6c6c6c",
-  },
-  downloadButton: {
-    padding: 5,
-  },
-  dateContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#E0F7FF",
-    borderRadius: 8,
-    marginVertical: 15,
-  },
-  dateText: {
-    fontSize: 16,
-    marginHorizontal: 10,
-  },
-  urgentContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: "auto",
-  },
-  urgentText: {
-    fontSize: 16,
-    color: "#FF3B30",
-    marginRight: 5,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 5,
-  },
-  descriptionText: {
-    fontSize: 16,
-    color: "#6c6c6c",
-    marginBottom: 15,
-  },
-  statusButton: {
-    backgroundColor: "#0097B2",
-    padding: 15,
-    alignItems: "center",
-    borderRadius: 8,
-    marginTop: 20,
-  },
-  statusButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
 };
 
 export default DetailsProjectScreen;

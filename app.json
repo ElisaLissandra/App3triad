@@ -19,6 +19,12 @@
     },
     "ios": {
       "bundleIdentifier": "n"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1831b5da-99d6-4203-a385-040bd1090c90"
     }
   }
 }
