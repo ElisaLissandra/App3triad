@@ -69,7 +69,7 @@ const DetailsProjectScreen = () => {
   };
 
   const handleStatusProject = () => {
-    navigation.navigate("StatusProject", { project: project });
+    navigation.navigate("StatusProject", { status: status }); 
   };
   
 
