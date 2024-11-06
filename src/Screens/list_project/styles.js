@@ -16,45 +16,45 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,  
-    marginRight: -24, 
-  }, 
+    fontWeight: "bold",
+    flex: 1, 
+    textAlign: "center", 
+  },
   scrollContainer: {
-    flex: 1, // Adiciona flexibilidade
-    marginBottom: 20, // Espaço abaixo do ScrollView
+    flex: 1, 
+    marginBottom: 20, 
+  },
+  searchWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   searchContainer: {
+    width: "82%",
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    borderRadius: 50,
+    borderRadius: 10,
     borderColor: "#E5E5E5",
     borderWidth: 1,
     paddingHorizontal: 15,
     marginBottom: 10,
+    
   },
   searchInput: {
     flex: 1,
-    width: 20,
     height: 60,
   },
-  searchButton: {
-    backgroundColor: "#0097B2",
-    borderRadius: 25,
-    padding: 10,
-    marginLeft: 10,
-  },
-  urgentFilterContainer: {
-    flexDirection: "row", 
-    alignItems: "center",
+  filterButton: {
+    paddingHorizontal: 15,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10, 
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
     marginBottom: 10,
-  },
-  urgentFilterLabel: {
-    flex: 1, 
-    fontSize: 15, 
-    color: "#101010", 
   },
   projectContainer: {
     backgroundColor: "#FFFFFF",
@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: "row",
     alignItems: "center",
-    elevation: 2,
     marginBottom: 20,
+    elevation: 2,
   },
   projectContent: {
     flexDirection: "row",
@@ -91,11 +91,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
- /*  projectDescription: {
-    color: "#0097B2",
-    fontWeight: "bold",
-    marginBottom: 5,
-  }, */
   projectDate: {
     color: "#888",
     paddingVertical: 3,
@@ -140,7 +135,7 @@ const styles = StyleSheet.create({
   },
 
   detailsButtonText: {
-    color: "#0097B2", // Cor branca para o texto
+    color: "#0097B2", 
     fontSize: 14,
     fontWeight: "bold",
   },
@@ -149,8 +144,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 5,
   },
-  urgentIcon: {
-    marginLeft: 'auto', // Ajuste o espaçamento conforme necessário
+  detailsUrgentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+    justifyContent: 'space-between', 
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  urgentBorder: {
+    borderColor: "#fecaca", 
   },
 
 });

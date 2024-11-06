@@ -23,6 +23,44 @@ const ProjectScreen = () => {
   const currentUser = auth.currentUser;
   const navigation = useNavigation();
 
+  const projectStatuses = [
+    {
+      /* text: "Pendente", */
+      icon: "hourglass-half",
+      iconColor: "#d97706",
+      key: "pendente",
+    },
+    {
+      /* text: "Projeto aceito ou recusado", */
+      icon: "check-circle",
+      iconColor: "#4caf50",
+      key: "aceito",
+    },
+    {
+      /* text: "Faltando informações", */
+      icon: "exclamation-circle",
+      iconColor: "#e53935",
+      key: "faltando_informacoes",
+    },
+    {
+      /* text: "Projeto em desenvolvimento", */
+      icon: "tools",
+      iconColor: "#ffa726",
+      key: "em_desenvolvimento",
+    },
+    {
+      /*  text: "Projeto concluído", */
+      icon: "check",
+      iconColor: "#0097B2",
+      key: "concluido",
+    },
+    {
+      icon: "times-circle",
+      iconColor: "#e53935",
+      key: "recusado",
+    },
+  ];
+
   const fetchProjects = () => {
     const unsubscribe = onSnapshot(
       collection(db, "projects"),
@@ -35,7 +73,7 @@ const ProjectScreen = () => {
           .filter((project) => project.userId === currentUser.uid);
 
         setProjects(projectsData);
-        setLoading(false); // Define loading como false após carregar os dados
+        setLoading(false);
       },
       (error) => {
         console.error("Erro ao escutar projetos:", error);
@@ -66,27 +104,30 @@ const ProjectScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Projetos</Text>
         <TouchableOpacity>
           <FontAwesome5 name="cog" size={24} color="#bfbfbf" />
         </TouchableOpacity>
+        <Text style={styles.title}>Projetos</Text>
       </View>
 
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Pesquisar..."
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-        <TouchableOpacity style={styles.searchButton}>
-          <FontAwesome5 name="search" size={20} color="#fff" />
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Pesquisar..."
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+          <FontAwesome5
+            name="search"
+            size={20}
+            color="#bfbfbf"
+            style={styles.searchButton}
+          />
+        </View>
+        <TouchableOpacity style={styles.filterButton}>
+          <FontAwesome5 name="filter" size={24} color="#0097B2" />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.urgentFilterContainer}>
-        <Text style={styles.urgentFilterLabel}>Mostrar apenas urgentes</Text>
-        <Switch value={showUrgentOnly} onValueChange={setShowUrgentOnly} />
       </View>
 
       <View style={styles.scrollContainer}>
@@ -94,62 +135,65 @@ const ProjectScreen = () => {
           style={styles.projectsListContainer}
           showsVerticalScrollIndicator={false}
         >
-          {loading ? (
-            <Text style={styles.loadingText}>Carregando projetos...</Text>
-          ) : (
-            <View>
-              {filteredProjects.length > 0 ? (
-                filteredProjects.map((project) => (
-                  <View key={project.id} style={styles.projectContainer}>
-                    <View style={styles.projectContent}>
-                      <View style={styles.iconCircle}>
-                        <FontAwesome5
-                          name="user-alt"
-                          size={30}
-                          color="#303030"
-                        />
-                      </View>
-                      <View style={styles.projectDetails}>
-                        <Text
-                          style={styles.projectTitle}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {project.title}
-                        </Text>
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((project) => {
+              // Buscar o status correspondente ao projeto
+              const status = projectStatuses.find(
+                (status) => status.key === project.status
+              );
 
-                        {/*  <Text style={styles.projectDescription}>
-                          {project.description}
-                        </Text> */}
-                        <Text style={styles.projectDate}>
-                          {project.deadline}
-                        </Text>
-                        <View style={styles.detailsUrgentContainer}>
-                          <TouchableOpacity
-                            style={styles.detailsButton}
-                            onPress={() => navigation.navigate("DetailsProject", { project })}
-                          >
-                            <Text style={styles.detailsButtonText}>
-                              Ver Detalhes
-                            </Text>
-                          </TouchableOpacity>
-                          {project.urgent && (
+              return (
+                <View
+                  key={project.id}
+                  style={[
+                    styles.projectContainer,
+                    project.urgent && styles.urgentBorder,
+                  ]}
+                >
+                  <View style={styles.projectContent}>
+                    <View style={styles.iconCircle}>
+                      <FontAwesome5 name="user-alt" size={30} color="#303030" />
+                    </View>
+                    <View style={styles.projectDetails}>
+                      <Text
+                        style={styles.projectTitle}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {project.title}
+                      </Text>
+                      <Text style={styles.projectDate}>{project.deadline}</Text>
+
+                      <View style={styles.detailsUrgentContainer}>
+                        <TouchableOpacity
+                          style={styles.detailsButton}
+                          onPress={() =>
+                            navigation.navigate("DetailsProject", { project })
+                          }
+                        >
+                          <Text style={styles.detailsButtonText}>
+                            Ver Detalhes
+                          </Text>
+                        </TouchableOpacity>
+
+                        {/* Exibir o ícone do status ao lado direito do botão */}
+                        {status && (
+                          <View style={styles.statusContainer}>
                             <FontAwesome5
-                              name="exclamation-triangle"
-                              size={20}
-                              color="#E74C3C"
-                              style={styles.urgentIcon}
+                              name={status.icon}
+                              size={22}
+                              color={status.iconColor}
                             />
-                          )}
-                        </View>
+                          </View>
+                        )}
                       </View>
                     </View>
                   </View>
-                ))
-              ) : (
-                <Text style={styles.noProjectsText}>Nenhum projeto encontrado</Text>
-              )}
-            </View>
+                </View>
+              );
+            })
+          ) : (
+            <Text style={styles.noProjectsText}>Nenhum projeto encontrado</Text>
           )}
         </ScrollView>
       </View>
