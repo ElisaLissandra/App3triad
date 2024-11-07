@@ -88,18 +88,6 @@ const ProjectScreen = () => {
     return unsubscribe;
   };
 
-
-  const toggleStatusSelection = (statusKey) => {
-    setSelectedStatus((prevSelected) => {
-      const selected = prevSelected || []; // Garantindo que prevSelected seja um array
-      if (selected.includes(statusKey)) {
-        return selected.filter((key) => key !== statusKey); // Remove status
-      } else {
-        return [...selected, statusKey]; // Adiciona status
-      }
-    });
-  };
-
   useEffect(() => {
     if (currentUser) {
       const unsubscribe = fetchProjects();
@@ -112,16 +100,21 @@ const ProjectScreen = () => {
       project.title.toLowerCase().includes(searchText.toLowerCase()) ||
       project.description.toLowerCase().includes(searchText.toLowerCase()) ||
       project.deadline.toLowerCase().includes(searchText.toLowerCase());
-  
+
     const matchesUrgent = !showUrgentOnly || project.urgent;
-    
+
     // Verificar se o status do projeto está na lista de status selecionados
     const matchesStatus =
-      selectedStatus.length === 0 || selectedStatus.includes(project.status); 
-  
+      selectedStatus.length === 0 || selectedStatus.includes(project.status);
+
     return matchesSearchText && matchesUrgent && matchesStatus;
   });
-  
+
+  const applyFilters = (urgent, status) => {
+    setShowUrgentOnly(urgent);
+    setSelectedStatus(status);
+    setIsModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -200,7 +193,7 @@ const ProjectScreen = () => {
                           </Text>
                         </TouchableOpacity>
 
-                        {status && (
+                        {status ? ( // Verifica se encontrou o status
                           <View
                             style={[
                               styles.statusContainer,
@@ -212,10 +205,9 @@ const ProjectScreen = () => {
                               size={18}
                               color={status.iconColor}
                             />
-                            <Text style={styles.statusLabel}>
-                              {status.label}
-                            </Text>
                           </View>
+                        ) : (
+                          <Text>Status desconhecido</Text> // Opcional: Exibe mensagem se o status não for encontrado
                         )}
                       </View>
                     </View>
@@ -229,14 +221,20 @@ const ProjectScreen = () => {
         </ScrollView>
       </View>
 
+      {/* Botão flutuante para adicionar projetos */}
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate("RequestProject")}
+      >
+        <FontAwesome5 name="plus" size={24} color="#ffffff" />
+      </TouchableOpacity>
+
       <FilterModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)} 
-        showUrgentOnly={showUrgentOnly}
-        setShowUrgentOnly={setShowUrgentOnly}
-        selectedStatus={selectedStatus || []}
-        setSelectedStatus={setSelectedStatus}
+        onApply={applyFilters}
+        initialShowUrgentOnly={showUrgentOnly}
+        initialSelectedStatus={selectedStatus}
         projectStatuses={projectStatuses}
       />
     </View>

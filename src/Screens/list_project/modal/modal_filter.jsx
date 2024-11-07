@@ -1,26 +1,31 @@
-import React from 'react';
-import { Modal, View, Text, Switch, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, Switch, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesome5 } from "@expo/vector-icons"; 
 import styles from "./styles";
 
 const FilterModal = ({
   visible,
   onClose,
-  showUrgentOnly,
-  setShowUrgentOnly,
-  selectedStatus = [],  // Inicializa como array vazio se não for passado
-  setSelectedStatus,
+  onApply,
+  initialShowUrgentOnly,
+  initialSelectedStatus,
   projectStatuses,
 }) => {
-  // Alterando para adicionar/remover status ao clicar
+  // Estados temporários para os filtros
+  const [tempShowUrgentOnly, setTempShowUrgentOnly] = useState(initialShowUrgentOnly);
+  const [tempSelectedStatus, setTempSelectedStatus] = useState(initialSelectedStatus);
+
+  useEffect(() => {
+    setTempShowUrgentOnly(initialShowUrgentOnly);
+    setTempSelectedStatus(initialSelectedStatus);
+  }, [initialShowUrgentOnly, initialSelectedStatus]);
+
   const toggleStatusSelection = (statusKey) => {
-    setSelectedStatus((prevSelected) => {
-      const selected = prevSelected || []; // Garantindo que prevSelected seja um array
-      if (selected.includes(statusKey)) {
-        return selected.filter((key) => key !== statusKey); // Remove status
-      } else {
-        return [...selected, statusKey]; // Adiciona status
-      }
+    setTempSelectedStatus((prevSelected) => {
+      const selected = prevSelected || [];
+      return selected.includes(statusKey)
+        ? selected.filter((key) => key !== statusKey)
+        : [...selected, statusKey];
     });
   };
 
@@ -34,8 +39,8 @@ const FilterModal = ({
           <View style={styles.filterOptionContainer}>
             <Text>Urgente</Text>
             <Switch
-              value={showUrgentOnly}
-              onValueChange={(value) => setShowUrgentOnly(value)}
+              value={tempShowUrgentOnly}
+              onValueChange={(value) => setTempShowUrgentOnly(value)}
             />
           </View>
 
@@ -47,10 +52,9 @@ const FilterModal = ({
                 <TouchableOpacity
                   key={status.key}
                   style={styles.statusOption}
-                  onPress={() => toggleStatusSelection(status.key)} // Chama a função de alternância
+                  onPress={() => toggleStatusSelection(status.key)}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {/* Exibe o ícone de acordo com o status */}
                     <FontAwesome5
                       name={status.icon} 
                       size={18} 
@@ -60,7 +64,7 @@ const FilterModal = ({
                     <Text
                       style={[
                         styles.statusOptionText,
-                        selectedStatus.includes(status.key) && styles.selectedStatus, // Adiciona estilo quando selecionado
+                        tempSelectedStatus.includes(status.key) && styles.selectedStatus,
                       ]}
                     >
                       {status.label}
@@ -76,7 +80,10 @@ const FilterModal = ({
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.applyButton} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => onApply(tempShowUrgentOnly, tempSelectedStatus)}
+            >
               <Text style={styles.applyButtonText}>Aplicar</Text>
             </TouchableOpacity>
           </View>
