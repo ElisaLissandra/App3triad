@@ -6,58 +6,61 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  Switch,
 } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { auth } from "../../../firebase-config";
-import { FontAwesome5 } from "@expo/vector-icons";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import FilterModal from "./modal/modal_filter";
 
 const ProjectScreen = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [showUrgentOnly, setShowUrgentOnly] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState([]);
   const currentUser = auth.currentUser;
   const navigation = useNavigation();
 
   const projectStatuses = [
     {
-      /* text: "Pendente", */
       icon: "hourglass-half",
       iconColor: "#d97706",
       key: "pendente",
+      label: "Pendente",
     },
     {
-      /* text: "Projeto aceito ou recusado", */
       icon: "check-circle",
       iconColor: "#4caf50",
       key: "aceito",
+      label: "Aceito",
     },
     {
-      /* text: "Faltando informações", */
       icon: "exclamation-circle",
       iconColor: "#e53935",
       key: "faltando_informacoes",
+      label: "Faltando Informações",
     },
     {
-      /* text: "Projeto em desenvolvimento", */
       icon: "tools",
       iconColor: "#ffa726",
       key: "em_desenvolvimento",
+      label: "Em Desenvolvimento",
     },
     {
-      /*  text: "Projeto concluído", */
       icon: "check",
       iconColor: "#0097B2",
       key: "concluido",
+      label: "Concluído",
     },
     {
       icon: "times-circle",
       iconColor: "#e53935",
       key: "recusado",
+      label: "Recusado",
     },
   ];
 
@@ -85,6 +88,18 @@ const ProjectScreen = () => {
     return unsubscribe;
   };
 
+
+  const toggleStatusSelection = (statusKey) => {
+    setSelectedStatus((prevSelected) => {
+      const selected = prevSelected || []; // Garantindo que prevSelected seja um array
+      if (selected.includes(statusKey)) {
+        return selected.filter((key) => key !== statusKey); // Remove status
+      } else {
+        return [...selected, statusKey]; // Adiciona status
+      }
+    });
+  };
+
   useEffect(() => {
     if (currentUser) {
       const unsubscribe = fetchProjects();
@@ -97,9 +112,16 @@ const ProjectScreen = () => {
       project.title.toLowerCase().includes(searchText.toLowerCase()) ||
       project.description.toLowerCase().includes(searchText.toLowerCase()) ||
       project.deadline.toLowerCase().includes(searchText.toLowerCase());
-
-    return matchesSearchText && (!showUrgentOnly || project.urgent);
+  
+    const matchesUrgent = !showUrgentOnly || project.urgent;
+    
+    // Verificar se o status do projeto está na lista de status selecionados
+    const matchesStatus =
+      selectedStatus.length === 0 || selectedStatus.includes(project.status); 
+  
+    return matchesSearchText && matchesUrgent && matchesStatus;
   });
+  
 
   return (
     <View style={styles.container}>
@@ -125,7 +147,10 @@ const ProjectScreen = () => {
             style={styles.searchButton}
           />
         </View>
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => setIsModalVisible(true)}
+        >
           <FontAwesome5 name="filter" size={24} color="#0097B2" />
         </TouchableOpacity>
       </View>
@@ -137,7 +162,6 @@ const ProjectScreen = () => {
         >
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project) => {
-              // Buscar o status correspondente ao projeto
               const status = projectStatuses.find(
                 (status) => status.key === project.status
               );
@@ -176,14 +200,21 @@ const ProjectScreen = () => {
                           </Text>
                         </TouchableOpacity>
 
-                        {/* Exibir o ícone do status ao lado direito do botão */}
                         {status && (
-                          <View style={styles.statusContainer}>
+                          <View
+                            style={[
+                              styles.statusContainer,
+                              { borderColor: status.iconColor },
+                            ]}
+                          >
                             <FontAwesome5
                               name={status.icon}
-                              size={22}
+                              size={18}
                               color={status.iconColor}
                             />
+                            <Text style={styles.statusLabel}>
+                              {status.label}
+                            </Text>
                           </View>
                         )}
                       </View>
@@ -193,22 +224,21 @@ const ProjectScreen = () => {
               );
             })
           ) : (
-            <Text style={styles.noProjectsText}>Nenhum projeto encontrado</Text>
+            <Text>Nenhum projeto encontrado.</Text>
           )}
         </ScrollView>
       </View>
 
-      {/* Botão flutuante para adicionar projetos */}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("RequestProject")}
-      >
-        <FontAwesome5 name="plus" size={24} color="#ffffff" />
-      </TouchableOpacity>
-
-      {/* Botão de logout */}
-      {/* Uncomment to enable logout button */}
-      {/* <Button title="Logout" onPress={() => auth.signOut()} /> */}
+      <FilterModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onCancel={() => setIsModalVisible(false)} 
+        showUrgentOnly={showUrgentOnly}
+        setShowUrgentOnly={setShowUrgentOnly}
+        selectedStatus={selectedStatus || []}
+        setSelectedStatus={setSelectedStatus}
+        projectStatuses={projectStatuses}
+      />
     </View>
   );
 };
