@@ -91,13 +91,6 @@ const styles = StyleSheet.create({
     color: '#0097B2', 
     fontWeight: 'bold', 
   },
-  /* passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  eyeIcon: {
-    marginLeft: 10,
-  }, */
   passwordContainer: {
     width: "80%",
     flexDirection: 'row',
@@ -122,9 +115,32 @@ const styles = StyleSheet.create({
     textAlign: "center",
     alignSelf: "center",  
     maxWidth: "80%",   
-  }
+  },
+
+
+  webContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  webTitle: {
+    fontSize: 32,
+    marginBottom: 20,
+    color: '#333',
+  },
+  webInput: {
+    width: '50%',
+    padding: 10,
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+  },
   
 });
 
 
-export default styles;
+export default styles; 
+

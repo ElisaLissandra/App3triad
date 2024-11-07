@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  PanResponder
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -24,42 +25,43 @@ const ProjectScreen = () => {
   const [selectedStatus, setSelectedStatus] = useState([]);
   const currentUser = auth.currentUser;
   const navigation = useNavigation();
+  const [buttonPosition, setButtonPosition] = useState({ x: 30, y: 600 });
 
   const projectStatuses = [
     {
       icon: "hourglass-half",
       iconColor: "#d97706",
-      key: "pendente",
+      key: "Pendente",
       label: "Pendente",
     },
     {
       icon: "check-circle",
       iconColor: "#4caf50",
-      key: "aceito",
+      key: "Aceito",
       label: "Aceito",
     },
     {
       icon: "exclamation-circle",
       iconColor: "#e53935",
-      key: "faltando_informacoes",
+      key: "Faltando Informações",
       label: "Faltando Informações",
     },
     {
       icon: "tools",
       iconColor: "#ffa726",
-      key: "em_desenvolvimento",
+      key: "Em Desenvolvimento",
       label: "Em Desenvolvimento",
     },
     {
       icon: "check",
       iconColor: "#0097B2",
-      key: "concluido",
+      key: "Concluído",
       label: "Concluído",
     },
     {
       icon: "times-circle",
       iconColor: "#e53935",
-      key: "recusado",
+      key: "Recusado",
       label: "Recusado",
     },
   ];
@@ -95,6 +97,18 @@ const ProjectScreen = () => {
     }
   }, [currentUser]);
 
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (e, gestureState) => {
+      setButtonPosition({
+        x: gestureState.moveX - 30, // ajuste para centralizar o botão
+        y: gestureState.moveY - 30,
+      });
+    },
+    onPanResponderRelease: () => {},
+  });
+
   const filteredProjects = projects.filter((project) => {
     const matchesSearchText =
       project.title.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -115,12 +129,13 @@ const ProjectScreen = () => {
     setSelectedStatus(status);
     setIsModalVisible(false);
   };
+  
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity>
-          <FontAwesome5 name="cog" size={24} color="#bfbfbf" />
+          <FontAwesome5 name="cog" size={24} color="#bfbfbf" onPress={() => navigation.navigate("Settings")}/>
         </TouchableOpacity>
         <Text style={styles.title}>Projetos</Text>
       </View>
@@ -221,13 +236,18 @@ const ProjectScreen = () => {
         </ScrollView>
       </View>
 
-      {/* Botão flutuante para adicionar projetos */}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("RequestProject")}
+      {/* Botão flutuante para adicionar projetos com movimento */}
+      <View
+        {...panResponder.panHandlers}
+        style={[
+          styles.addButton,
+          { position: "absolute", left: buttonPosition.x, top: buttonPosition.y },
+        ]}
       >
-        <FontAwesome5 name="plus" size={24} color="#ffffff" />
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("RequestProject")}>
+          <FontAwesome5 name="plus" size={24} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
 
       <FilterModal
         visible={isModalVisible}

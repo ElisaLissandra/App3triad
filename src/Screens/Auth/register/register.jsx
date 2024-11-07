@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../firebase-config";
+import { auth } from "../../../../firebase-config";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text'; // Importar a biblioteca de máscara

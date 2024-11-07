@@ -2,12 +2,12 @@ import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Welcome from "./src/Screens/welcome/welcome";
-import Login from "./src/Auth/login/login";
-import Register from "./src/Auth/register/register";
+import Login from "./src/Screens/Auth/login/login";
+import Register from "./src/Screens/Auth/register/register";
 import RequestProject from "./src/Screens/request_project/request_project";
 import ListProject from "./src/Screens/list_project/list_project";
 import DetailsProject from "./src/Screens/details_project/details_project";
-import StatusProject from "./src/Screens/status_project/status_project";
+import Settings from "./src/Screens/settings/settings";
 import { auth } from "./firebase-config";
 
 
@@ -82,10 +82,10 @@ export default function App() {
             </ProtectedRoute>
           )}
         </Stack.Screen>
-        <Stack.Screen name="StatusProject" options={{ headerShown: false }}>
+        <Stack.Screen name="Settings" options={{ headerShown: false }}>
           {() => (
             <ProtectedRoute user={user}>
-              <StatusProject />
+              <Settings />
             </ProtectedRoute>
           )}
         </Stack.Screen>

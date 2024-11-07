@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import { db, storage } from "../../../firebase-config"; // Importando o Firestore e o Storage
+import { db, storage } from "../../../firebase-config"; 
 import { collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";

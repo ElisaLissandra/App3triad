@@ -17,7 +17,7 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import styles from "./styles";
 import * as MediaLibrary from "expo-media-library";
-import * as Notifications from "expo-notifications";
+
 
 const DetailsProjectScreen = () => {
   const route = useRoute();
@@ -169,6 +169,9 @@ const DetailsProjectScreen = () => {
           <Text style={styles.subHeader}>Informações do Projeto</Text>
           <Text style={styles.sectionTitle}>Título do projeto</Text>
           <Text style={styles.titleProject}>{title}</Text>
+
+          <Text style={styles.sectionTitle}>Status do projeto</Text>
+          <Text style={styles.titleProject}>{status}</Text>
 
           {/* Section de arquivos */}
           <Text style={styles.sectionTitle}>Baixar arquivo</Text>
