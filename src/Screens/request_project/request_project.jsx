@@ -10,9 +10,10 @@ import {
   Platform,
   Keyboard,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import { db, storage } from "../../../firebase-config"; 
+import { db, storage } from "../../../firebase-config";
 import { collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -30,8 +31,11 @@ const RequestProject = () => {
   const [files, setFiles] = useState([]);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Listen for keyboard show/hide events
+  // Verifica se todos os campos obrigatórios estão preenchidos
+  const isFormComplete = title && description && generalContext && deadline;
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -46,7 +50,6 @@ const RequestProject = () => {
       }
     );
 
-    // Cleanup listeners on unmount
     return () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
@@ -54,28 +57,6 @@ const RequestProject = () => {
   }, []);
 
   const toggleSwitch = () => setUrgent((previousState) => !previousState);
-
-  /* const handleFileUpload = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({});
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
-        const newFile = {
-          uri: file.uri,
-          name: file.name,
-          size: file.size,
-          date: new Date(file.modificationTime).toLocaleDateString(),
-        };
-        setFiles((prevFiles) => [...prevFiles, newFile]); // Adiciona o arquivo à lista
-        Alert.alert("Arquivo anexado:", file.name);
-      } else {
-        Alert.alert("Nenhum arquivo selecionado.");
-      }
-    } catch (error) {
-      Alert.alert("Erro ao anexar arquivo:", error.message);
-      console.log("Erro ao anexar arquivo:", error.message);
-    }
-  }; */
 
   const handleFileUpload = async () => {
     try {
@@ -119,6 +100,8 @@ const RequestProject = () => {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -140,6 +123,8 @@ const RequestProject = () => {
         } catch (uploadError) {
           Alert.alert("Erro ao fazer upload de arquivo", uploadError.message);
           console.error("Erro ao fazer upload de arquivo:", uploadError);
+          setIsLoading(false);
+          return;
         }
       }
 
@@ -150,7 +135,7 @@ const RequestProject = () => {
         deadline,
         urgent,
         files: uploadedFileUrls, // Lista de URLs dos arquivos
-        status: "pendente",
+        status: "Pendente",
         userId: currentUser.uid,
       });
 
@@ -164,6 +149,8 @@ const RequestProject = () => {
     } catch (error) {
       Alert.alert("Erro ao enviar o projeto", error.message);
       console.error("Erro ao enviar o projeto:", error);
+    } finally {
+      setIsLoading(false); // Desativa o estado de carregamento
     }
   };
 
@@ -210,23 +197,6 @@ const RequestProject = () => {
             onChangeText={setDescription}
             multiline={true}
           />
-
-          {/* File Upload Placeholder */}
-          {/* <Text style={styles.label}>Anexar arquivos</Text>
-          <TouchableOpacity
-            style={styles.fileUploadButton}
-            onPress={handleFileUpload}
-          >
-            <Text style={styles.buttonText}>Anexar arquivo</Text>
-          </TouchableOpacity>
-
-          {files.map((file, index) => (
-            <View key={index} style={styles.fileDetailsContainer}>
-              <Text style={styles.fileDetail}>Nome: {file.name}</Text>
-              <Text style={styles.fileDetail}>Tamanho: {(file.size / 1024).toFixed(2)} KB</Text>
-              <Text style={styles.fileDetail}>Data: {file.date}</Text>
-            </View>
-          ))}  */}
 
           <View style={styles.container}>
             {/* Botão para upload de arquivo */}
@@ -303,8 +273,22 @@ const RequestProject = () => {
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          {/* <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Enviar</Text>
+          </TouchableOpacity> */}
+           <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (isLoading || !isFormComplete) && { backgroundColor: "#d3d3d3" },
+            ]}
+            onPress={handleSubmit}
+            disabled={isLoading || !isFormComplete} // Desativa o botão se estiver carregando ou incompleto
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <Text style={styles.submitButtonText}>Enviar</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

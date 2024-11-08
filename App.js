@@ -7,9 +7,9 @@ import Register from "./src/Screens/Auth/register/register";
 import RequestProject from "./src/Screens/request_project/request_project";
 import ListProject from "./src/Screens/list_project/list_project";
 import DetailsProject from "./src/Screens/details_project/details_project";
+import Chat from "./src/Screens/chat/chat";
 import Settings from "./src/Screens/settings/settings";
 import { auth } from "./firebase-config";
-
 
 const Stack = createNativeStackNavigator();
 
@@ -21,15 +21,12 @@ const ProtectedRoute = ({ user, children }) => {
 export default function App() {
   const [user, setUser] = React.useState(null); // Estado para armazenar o usuário logado
   const [isLoading, setIsLoading] = React.useState(true); // Controle de carregamento
-  const [initialRoute, setInitialRoute] = React.useState("Welcome");
 
   React.useEffect(() => {
     // Monitorando o estado de autenticação do Firebase
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user ? user : null); // Define o estado do usuário logado
       setIsLoading(false); // Fim do carregamento
-      // Define a rota inicial com base na autenticação do usuário
-      setInitialRoute(user ? "ListProject" : "Login");
     });
 
     // Cleanup function para cancelar o monitoramento quando o componente desmontar
@@ -42,7 +39,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={initialRoute}>
+      <Stack.Navigator initialRouteName={user ? "ListProject" : "Welcome"}>
         <Stack.Screen
           name="Welcome"
           component={Welcome}
@@ -59,36 +56,36 @@ export default function App() {
           options={{ headerShown: false }}
         />
 
-        {/* Protegendo as rotas */}
-        <Stack.Screen name="ListProject" options={{ headerShown: false }}>
-          {() => (
-            <ProtectedRoute user={user}>
-              <ListProject />
-            </ProtectedRoute>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="RequestProject" options={{ headerShown: false }}>
-          {() => (
-            <ProtectedRoute user={user}>
-              <RequestProject />
-            </ProtectedRoute>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="DetailsProject" options={{ headerShown: false }}>
-          {() => (
-            <ProtectedRoute user={user}>
-              <DetailsProject />
-            </ProtectedRoute>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="Settings" options={{ headerShown: false }}>
-          {() => (
-            <ProtectedRoute user={user}>
-              <Settings />
-            </ProtectedRoute>
-          )}
-        </Stack.Screen>
+        {/* Agrupando rotas protegidas */}
+        {user && (
+          <Stack.Group>
+            <Stack.Screen
+              name="ListProject"
+              component={ListProject}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="RequestProject"
+              component={RequestProject}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="DetailsProject"
+              component={DetailsProject}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={Settings}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Chat"
+              component={Chat}
+              options={{ headerShown: false }}
+            />
+          </Stack.Group>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

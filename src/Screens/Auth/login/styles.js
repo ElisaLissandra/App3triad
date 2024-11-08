@@ -116,29 +116,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",  
     maxWidth: "80%",   
   },
-
-
-  webContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  webTitle: {
-    fontSize: 32,
-    marginBottom: 20,
-    color: '#333',
-  },
-  webInput: {
-    width: '50%',
-    padding: 10,
-    marginVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-  
 });
 
 

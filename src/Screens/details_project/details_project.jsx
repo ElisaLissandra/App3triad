@@ -70,8 +70,8 @@ const DetailsProjectScreen = () => {
     navigation.navigate("ListProject");
   };
 
-  const handleStatusProject = () => {
-    navigation.navigate("StatusProject", { status: status });
+  const handleChat = () => {
+    navigation.navigate("Chat");
   };
   
   const downloadFile = async (fileUrl, fileName) => {
@@ -219,8 +219,8 @@ const DetailsProjectScreen = () => {
           <Text style={styles.descriptionText}>{generalContext}</Text>
 
           {/* Botão Acompanhar status */}
-          <TouchableOpacity style={styles.statusButton} onPress={handleStatusProject}>
-            <Text style={styles.statusButtonText}>Acompanhar status</Text>
+          <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
+            <Text style={styles.statusButtonText}>Adicionar mais informações</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
