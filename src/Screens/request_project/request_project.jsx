@@ -17,7 +17,6 @@ import { collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import styles from "./styles";
-import NavigationBar from "../../Components/NavBar/Navbar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { TextInputMask } from "react-native-masked-text";

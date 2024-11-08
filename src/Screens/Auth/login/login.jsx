@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./styles";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,  useFocusEffect } from "@react-navigation/native";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import {
@@ -52,6 +52,13 @@ const LoginScreen = () => {
         });
     }
   }, [response]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setEmail("");
+      setPassword("");
+    }, [])
+  );
 
   const handleLogin = () => {
     setErrorMessage("");
