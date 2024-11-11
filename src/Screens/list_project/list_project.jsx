@@ -102,7 +102,7 @@ const ProjectScreen = () => {
                 ...doc.data(),
               }));
 
-              console.log("Projetos do usuário:", projectsData);
+              //console.log("Projetos do usuário:", projectsData);
               setProjects(projectsData);
               setLoading(false);
             },

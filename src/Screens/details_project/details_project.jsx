@@ -11,13 +11,12 @@ import {
 import { useRoute } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { db } from "../../../firebase-config";
+import { auth, db } from "../../../firebase-config";
 import { doc, getDoc } from "firebase/firestore";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import styles from "./styles";
 import * as MediaLibrary from "expo-media-library";
-
 
 const DetailsProjectScreen = () => {
   const route = useRoute();
@@ -33,7 +32,7 @@ const DetailsProjectScreen = () => {
   } = project;
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
-
+  const [isAdmin, setIsAdmin] = useState(false);
   const userId = project.userId;
 
   const getUserById = async (userId) => {
@@ -53,18 +52,29 @@ const DetailsProjectScreen = () => {
     }
   };
 
+  // Obter o usuário autenticado e verificar se é admin
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchAuthenticatedUser = async () => {
       try {
-        const userData = await getUserById(userId);
-        setUser(userData);
+        //const auth = getAuth();
+        const authenticatedUser = auth.currentUser;
+
+        if (authenticatedUser) {
+          const userData = await getUserById(authenticatedUser.uid);
+          setUser(userData);
+          setIsAdmin(userData?.isAdmin || false); // Define como admin se a propriedade `isAdmin` for true
+          console.log("E admin?", isAdmin);
+        }
       } catch (error) {
-        console.error("Erro ao buscar informações do usuário:", error);
+        console.error(
+          "Erro ao buscar informações do usuário autenticado:",
+          error
+        );
       }
     };
 
-    if (userId) fetchUser();
-  }, [userId]);
+    fetchAuthenticatedUser();
+  }, []);
 
   const handleListProject = () => {
     navigation.navigate("ListProject");
@@ -73,52 +83,65 @@ const DetailsProjectScreen = () => {
   const handleChat = () => {
     navigation.navigate("Chat");
   };
-  
+
   const downloadFile = async (fileUrl, fileName) => {
     try {
       if (!fileUrl) {
         Alert.alert("Erro", "URL do arquivo inválida.");
         return;
       }
-  
+
       if (Platform.OS === "android") {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permissão necessária", "A permissão de armazenamento é necessária para baixar arquivos.");
+          Alert.alert(
+            "Permissão necessária",
+            "A permissão de armazenamento é necessária para baixar arquivos."
+          );
           return;
         }
       }
-  
+
       // Defina o caminho do arquivo no diretório do aplicativo
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-  
+
       // Baixar o arquivo
       const { uri } = await FileSystem.downloadAsync(fileUrl, fileUri);
-  
+
       if (uri) {
         // No Android, mover o arquivo para o armazenamento público
         if (Platform.OS === "android") {
           const newUri = `${FileSystem.documentDirectory}Download/${fileName}`;
-          
+
           // Certifique-se de que o diretório de download existe ou crie um novo diretório
-          await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'Download', { intermediates: true });
-  
+          await FileSystem.makeDirectoryAsync(
+            FileSystem.documentDirectory + "Download",
+            { intermediates: true }
+          );
+
           // Copiar o arquivo para o novo diretório
           await FileSystem.copyAsync({ from: uri, to: newUri });
-  
+
           // Crie o ativo de mídia e adicione à galeria
           const asset = await MediaLibrary.createAssetAsync(newUri);
-          
+
           // Crie ou adicione ao álbum 'Download'
-          const albumName = 'Download';
+          const albumName = "Download";
           let album = await MediaLibrary.getAlbumAsync(albumName);
           if (!album) {
-            album = await MediaLibrary.createAlbumAsync(albumName, asset, false);
+            album = await MediaLibrary.createAlbumAsync(
+              albumName,
+              asset,
+              false
+            );
           } else {
             await MediaLibrary.addAssetsToAlbumAsync([asset], album.id, false);
           }
-  
-          Alert.alert("Download completo!", "O arquivo foi baixado e adicionado à galeria.");
+
+          Alert.alert(
+            "Download completo!",
+            "O arquivo foi baixado e adicionado à galeria."
+          );
         } else {
           // Para iOS, compartilhe o arquivo após o download
           await Sharing.shareAsync(uri);
@@ -131,8 +154,7 @@ const DetailsProjectScreen = () => {
       Alert.alert("Erro", "Não foi possível baixar o arquivo.");
     }
   };
-  
-  
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -152,21 +174,25 @@ const DetailsProjectScreen = () => {
           </View>
 
           {/* Informações do Usuário */}
-          <Text style={styles.subHeader}>Informações do Usuário</Text>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Nome: </Text>
-            <Text style={styles.userInfo}>{user?.fullName}</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Email: </Text>
-            <Text style={styles.userInfo}>{user?.email}</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Contato: </Text>
-            <Text style={styles.userInfo}>{user?.contact}</Text>
-          </View>
+          {isAdmin && (
+            <>
+              <Text style={styles.subHeader}>Informações do Usuário</Text>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Nome: </Text>
+                <Text style={styles.userInfo}>{user.fullName}</Text>
+              </View>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Email: </Text>
+                <Text style={styles.userInfo}>{user.email}</Text>
+              </View>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Contato: </Text>
+                <Text style={styles.userInfo}>{user.contact}</Text>
+              </View>
+              <Text style={styles.subHeader}>Informações do Projeto</Text>
+            </>
+          )}
 
-          <Text style={styles.subHeader}>Informações do Projeto</Text>
           <Text style={styles.sectionTitle}>Título do projeto</Text>
           <Text style={styles.titleProject}>{title}</Text>
 
@@ -220,7 +246,9 @@ const DetailsProjectScreen = () => {
 
           {/* Botão Acompanhar status */}
           <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
-            <Text style={styles.statusButtonText}>Adicionar mais informações</Text>
+            <Text style={styles.statusButtonText}>
+              Adicionar mais informações
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
