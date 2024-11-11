@@ -9,13 +9,12 @@ import {
   PanResponder,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { auth } from "../../../firebase-config";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import FilterModal from "./modal/modal_filter";
-import { query, where } from "firebase/firestore";
 
 const ProjectScreen = () => {
   const [projects, setProjects] = useState([]);
@@ -27,7 +26,6 @@ const ProjectScreen = () => {
   const currentUser = auth.currentUser;
   const navigation = useNavigation();
   const [buttonPosition, setButtonPosition] = useState({ x: 30, y: 600 });
-
 
   const projectStatuses = [
     {
@@ -71,40 +69,69 @@ const ProjectScreen = () => {
   const fetchProjects = (currentUserId) => {
     if (!currentUserId) {
       console.error("currentUserId é indefinido");
-      return; 
+      return;
     }
 
-    const unsubscribe = onSnapshot(
-      query(collection(db, "projects"), where("userId", "==", currentUserId)),
-      (querySnapshot) => {
-        let projectsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    // Primeiro, busque o documento do usuário para verificar se ele é admin
+    const userDocRef = doc(db, "users", currentUserId); // Supondo que você tenha uma coleção "users"
 
-        console.log("Projetos do usuário:", projectsData);
-        setProjects(projectsData);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Erro ao escutar projetos:", error);
-        Alert.alert("Erro", "Não foi possível carregar os projetos.");
-        setLoading(false);
-      }
-    );
+    getDoc(userDocRef)
+      .then((userDoc) => {
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const isAdmin = userData.isAdmin || false; // Verifica se o usuário é admin
 
-    return unsubscribe;
+          let projectsQuery;
+
+          if (isAdmin) {
+            // Se for admin, busca todos os projetos
+            projectsQuery = collection(db, "projects");
+          } else {
+            // Se não for admin, busca apenas os projetos do usuário
+            projectsQuery = query(
+              collection(db, "projects"),
+              where("userId", "==", currentUserId)
+            );
+          }
+
+          const unsubscribe = onSnapshot(
+            projectsQuery,
+            (querySnapshot) => {
+              let projectsData = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+
+              console.log("Projetos do usuário:", projectsData);
+              setProjects(projectsData);
+              setLoading(false);
+            },
+            (error) => {
+              console.error("Erro ao escutar projetos:", error);
+              Alert.alert("Erro", "Não foi possível carregar os projetos.");
+              setLoading(false);
+            }
+          );
+
+          return unsubscribe;
+        } else {
+          console.error("Documento do usuário não encontrado.");
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar documento do usuário:", error);
+      });
   };
 
   useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged(user => {
+    const unsubscribeFromAuth = auth.onAuthStateChanged((user) => {
       if (user) {
-        fetchProjects(user.uid); 
+        fetchProjects(user.uid);
       } else {
         console.error("Nenhum usuário está conectado no momento.");
       }
     });
-  
+
     return () => unsubscribeFromAuth();
   }, []);
 
