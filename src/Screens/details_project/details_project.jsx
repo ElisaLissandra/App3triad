@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -17,6 +18,7 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import styles from "./styles";
 import * as MediaLibrary from "expo-media-library";
+import { Picker } from "@react-native-picker/picker";
 
 const DetailsProjectScreen = () => {
   const route = useRoute();
@@ -33,7 +35,9 @@ const DetailsProjectScreen = () => {
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
   const [isAdmin, setIsAdmin] = useState(false);
-  const userId = project.userId;
+  //const userId = project.userId;
+  const [selectedStatus, setSelectedStatus] = useState(status);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getUserById = async (userId) => {
     try {
@@ -70,6 +74,8 @@ const DetailsProjectScreen = () => {
           "Erro ao buscar informações do usuário autenticado:",
           error
         );
+      }finally {
+        setIsLoading(false);
       }
     };
 
@@ -83,6 +89,14 @@ const DetailsProjectScreen = () => {
   const handleChat = () => {
     navigation.navigate("Chat");
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0097B2" />
+      </View>
+    );
+  }
 
   const downloadFile = async (fileUrl, fileName) => {
     try {
@@ -155,6 +169,18 @@ const DetailsProjectScreen = () => {
     }
   };
 
+  const handleStatusChange = async (newStatus) => {
+    setSelectedStatus(newStatus);
+    try {
+      const projectRef = doc(db, "projects", project.id); // Assuming project.id exists
+      await updateDoc(projectRef, { status: newStatus });
+      Alert.alert("Sucesso", "Status atualizado com sucesso.");
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o status.");
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -197,7 +223,27 @@ const DetailsProjectScreen = () => {
           <Text style={styles.titleProject}>{title}</Text>
 
           <Text style={styles.sectionTitle}>Status do projeto</Text>
-          <Text style={styles.titleProject}>{status}</Text>
+          {isAdmin ? (
+            <Picker
+              selectedValue={selectedStatus}
+              onValueChange={(itemValue) => handleStatusChange(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Pendente" value="Pendente" />
+              <Picker.Item
+                label="Faltando Informações"
+                value="Faltando Informações"
+              />
+              <Picker.Item
+                label="Em Desenvolvimento"
+                value="Em Desenvolvimento"
+              />
+              <Picker.Item label="Concluído" value="Concluído" />
+              {/* Add more statuses as needed */}
+            </Picker>
+          ) : (
+            <Text style={styles.titleProject}>{selectedStatus}</Text>
+          )}
 
           {/* Section de arquivos */}
           <Text style={styles.sectionTitle}>Baixar arquivo</Text>
@@ -245,11 +291,35 @@ const DetailsProjectScreen = () => {
           <Text style={styles.descriptionText}>{generalContext}</Text>
 
           {/* Botão Acompanhar status */}
-          <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
+          {/* <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
             <Text style={styles.statusButtonText}>
               Adicionar mais informações
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          {isAdmin ? (
+            // Show "Recusar" and "Aceitar" buttons for admin users
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.rejectButton}
+                onPress={() => handleStatusChange("Recusado")}
+              >
+                <Text style={styles.buttonText}>Recusar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.acceptButton}
+                onPress={() => handleStatusChange("Aceito")}
+              >
+                <Text style={styles.buttonText}>Aceitar</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            // Show "Adicionar mais informações" button for regular users
+            <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
+              <Text style={styles.statusButtonText}>
+                Adicionar mais informações
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

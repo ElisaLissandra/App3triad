@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -15,13 +15,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 30,
-    justifyContent: "center", 
+    justifyContent: "center",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    flex: 1, 
-    textAlign: "center", 
+    flex: 1,
+    textAlign: "center",
   },
   titleProject: {
     fontSize: 16,
@@ -30,13 +30,13 @@ const styles = StyleSheet.create({
   },
   userInfoContainer: {
     flexDirection: "row",
-    alignItems: "center", 
+    alignItems: "center",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold", 
-    marginBottom: 0, 
-    color: "#333", 
+    fontWeight: "bold",
+    marginBottom: 0,
+    color: "#333",
     lineHeight: 22,
   },
   userInfo: {
@@ -125,6 +125,35 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  buttonContainer: {
+    flexDirection: "row", // Aligns buttons side by side
+    justifyContent: "space-between", // Adds space between buttons
+    marginTop: 20,
+  },
+  rejectButton: {
+    backgroundColor: "#E74C3C",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1, // Ensures buttons take equal space
+    marginRight: 10,
+  },
+  acceptButton: {
+    backgroundColor: "#27AE60",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1, // Ensures buttons take equal space
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
   },
 });
 
