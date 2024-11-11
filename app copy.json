@@ -18,7 +18,7 @@
       ]
     },
     "ios": {
-      "bundleIdentifier": "com.elisa_expo.App3triad"
+      "bundleIdentifier": "n"
     },
     "runtimeVersion": {
       "policy": "appVersion"
@@ -28,7 +28,6 @@
     },
     "plugins": [
       "expo-secure-store"
-    ],
-    "platforms": ["ios", "android", "web"]
+    ]
   }
 }

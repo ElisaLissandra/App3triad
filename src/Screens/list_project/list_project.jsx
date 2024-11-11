@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  PanResponder
+  PanResponder,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -15,6 +15,7 @@ import { auth } from "../../../firebase-config";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import FilterModal from "./modal/modal_filter";
+import { query, where } from "firebase/firestore";
 
 const ProjectScreen = () => {
   const [projects, setProjects] = useState([]);
@@ -26,6 +27,7 @@ const ProjectScreen = () => {
   const currentUser = auth.currentUser;
   const navigation = useNavigation();
   const [buttonPosition, setButtonPosition] = useState({ x: 30, y: 600 });
+
 
   const projectStatuses = [
     {
@@ -66,24 +68,28 @@ const ProjectScreen = () => {
     },
   ];
 
-  const fetchProjects = () => {
-    const unsubscribe = onSnapshot(
-      collection(db, "projects"),
-      (querySnapshot) => {
-        const projectsData = querySnapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter((project) => project.userId === currentUser.uid);
+  const fetchProjects = (currentUserId) => {
+    if (!currentUserId) {
+      console.error("currentUserId é indefinido");
+      return; 
+    }
 
+    const unsubscribe = onSnapshot(
+      query(collection(db, "projects"), where("userId", "==", currentUserId)),
+      (querySnapshot) => {
+        let projectsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        console.log("Projetos do usuário:", projectsData);
         setProjects(projectsData);
         setLoading(false);
       },
       (error) => {
         console.error("Erro ao escutar projetos:", error);
         Alert.alert("Erro", "Não foi possível carregar os projetos.");
-        setLoading(false); // Define loading como false mesmo em caso de erro
+        setLoading(false);
       }
     );
 
@@ -91,12 +97,22 @@ const ProjectScreen = () => {
   };
 
   useEffect(() => {
+    const unsubscribeFromAuth = auth.onAuthStateChanged(user => {
+      if (user) {
+        fetchProjects(user.uid); 
+      } else {
+        console.error("Nenhum usuário está conectado no momento.");
+      }
+    });
+  
+    return () => unsubscribeFromAuth();
+  }, []);
+
+  useEffect(() => {
     if (currentUser) {
-      const unsubscribe = fetchProjects();
-      return () => unsubscribe();
+      fetchProjects(currentUser.uid); // Passa o ID do usuário atual
     }
   }, [currentUser]);
-
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -129,13 +145,17 @@ const ProjectScreen = () => {
     setSelectedStatus(status);
     setIsModalVisible(false);
   };
-  
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity>
-          <FontAwesome5 name="cog" size={24} color="#bfbfbf" onPress={() => navigation.navigate("Settings")}/>
+          <FontAwesome5
+            name="cog"
+            size={24}
+            color="#bfbfbf"
+            onPress={() => navigation.navigate("Settings")}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Projetos</Text>
       </View>
@@ -241,7 +261,11 @@ const ProjectScreen = () => {
         {...panResponder.panHandlers}
         style={[
           styles.addButton,
-          { position: "absolute", left: buttonPosition.x, top: buttonPosition.y },
+          {
+            position: "absolute",
+            left: buttonPosition.x,
+            top: buttonPosition.y,
+          },
         ]}
       >
         <TouchableOpacity onPress={() => navigation.navigate("RequestProject")}>

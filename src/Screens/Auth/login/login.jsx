@@ -78,9 +78,10 @@ const LoginScreen = () => {
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        if (userData.role === "admin") {
+        if (userData.isAdmin) {
           console.log("Usuário é admin");
           //navigation.navigate("AdminDashboard");
+          navigation.navigate("ListProject");
         } else {
           navigation.navigate("ListProject");
         }
