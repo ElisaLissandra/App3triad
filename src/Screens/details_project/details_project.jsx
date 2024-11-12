@@ -7,13 +7,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../../firebase-config";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import styles from "./styles";
@@ -33,6 +33,7 @@ const DetailsProjectScreen = () => {
     files = [],
   } = project;
   const [user, setUser] = useState(null);
+  const [projectUser, setProjectUser] = useState(null);
   const navigation = useNavigation();
   const [isAdmin, setIsAdmin] = useState(false);
   //const userId = project.userId;
@@ -66,15 +67,21 @@ const DetailsProjectScreen = () => {
         if (authenticatedUser) {
           const userData = await getUserById(authenticatedUser.uid);
           setUser(userData);
-          setIsAdmin(userData?.isAdmin || false); // Define como admin se a propriedade `isAdmin` for true
-          console.log("E admin?", isAdmin);
+          setIsAdmin(userData?.isAdmin || false);
+        }
+
+        // Verifica se o projeto tem um userId do solicitante
+        if (project.userId) {
+          // Busca o usuário solicitante do projeto
+          const projectUserData = await getUserById(project.userId);
+          setProjectUser(projectUserData); // Define os dados do solicitante do projeto
         }
       } catch (error) {
         console.error(
           "Erro ao buscar informações do usuário autenticado:",
           error
         );
-      }finally {
+      } finally {
         setIsLoading(false);
       }
     };
@@ -170,16 +177,25 @@ const DetailsProjectScreen = () => {
   };
 
   const handleStatusChange = async (newStatus) => {
-    setSelectedStatus(newStatus);
+    setSelectedStatus(newStatus); // Atualiza o estado local com o novo status
+
     try {
-      const projectRef = doc(db, "projects", project.id); // Assuming project.id exists
-      await updateDoc(projectRef, { status: newStatus });
-      Alert.alert("Sucesso", "Status atualizado com sucesso.");
+      const projectRef = doc(db, "projects", project.id); // Referência do documento do projeto
+      await updateDoc(projectRef, { status: newStatus }); // Atualiza o campo "status" no Firestore
+
+      Alert.alert("Sucesso", "Status atualizado com sucesso."); // Exibe mensagem de sucesso
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
-      Alert.alert("Erro", "Não foi possível atualizar o status.");
+      Alert.alert("Erro", "Não foi possível atualizar o status."); // Exibe mensagem de erro
     }
   };
+
+  const showAcceptRejectButtons = ![
+    "Aceito",
+    "Em Desenvolvimento",
+    "Faltando Informações",
+    "Concluído",
+  ].includes(selectedStatus);
 
   return (
     <KeyboardAvoidingView
@@ -205,15 +221,15 @@ const DetailsProjectScreen = () => {
               <Text style={styles.subHeader}>Informações do Usuário</Text>
               <View style={styles.userInfoContainer}>
                 <Text style={styles.sectionTitle}>Nome: </Text>
-                <Text style={styles.userInfo}>{user.fullName}</Text>
+                <Text style={styles.userInfo}>{projectUser.fullName}</Text>
               </View>
               <View style={styles.userInfoContainer}>
                 <Text style={styles.sectionTitle}>Email: </Text>
-                <Text style={styles.userInfo}>{user.email}</Text>
+                <Text style={styles.userInfo}>{projectUser.email}</Text>
               </View>
               <View style={styles.userInfoContainer}>
                 <Text style={styles.sectionTitle}>Contato: </Text>
-                <Text style={styles.userInfo}>{user.contact}</Text>
+                <Text style={styles.userInfo}>{projectUser.contact}</Text>
               </View>
               <Text style={styles.subHeader}>Informações do Projeto</Text>
             </>
@@ -239,6 +255,8 @@ const DetailsProjectScreen = () => {
                 value="Em Desenvolvimento"
               />
               <Picker.Item label="Concluído" value="Concluído" />
+              <Picker.Item label="Aceito" value="Aceito" enabled={false} />
+              <Picker.Item label="Recusado" value="Recusado" enabled={false} />
               {/* Add more statuses as needed */}
             </Picker>
           ) : (
@@ -291,29 +309,26 @@ const DetailsProjectScreen = () => {
           <Text style={styles.descriptionText}>{generalContext}</Text>
 
           {/* Botão Acompanhar status */}
-          {/* <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
-            <Text style={styles.statusButtonText}>
-              Adicionar mais informações
-            </Text>
-          </TouchableOpacity> */}
-          {isAdmin ? (
-            // Show "Recusar" and "Aceitar" buttons for admin users
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={() => handleStatusChange("Recusado")}
-              >
-                <Text style={styles.buttonText}>Recusar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.acceptButton}
-                onPress={() => handleStatusChange("Aceito")}
-              >
-                <Text style={styles.buttonText}>Aceitar</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            // Show "Adicionar mais informações" button for regular users
+          {showAcceptRejectButtons && isAdmin && (
+            <>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={() => handleStatusChange("Recusado")}
+                >
+                  <Text style={styles.buttonText}>Recusar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.acceptButton}
+                  onPress={() => handleStatusChange("Aceito")}
+                >
+                  <Text style={styles.buttonText}>Aceitar</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+          {!showAcceptRejectButtons && isAdmin && (
             <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
               <Text style={styles.statusButtonText}>
                 Adicionar mais informações
