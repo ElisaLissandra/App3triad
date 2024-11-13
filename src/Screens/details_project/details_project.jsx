@@ -328,8 +328,17 @@ const DetailsProjectScreen = () => {
             </>
           )}
 
-          {!showAcceptRejectButtons && isAdmin && (
-            <TouchableOpacity style={styles.statusButton} onPress={handleChat}>
+          {!showAcceptRejectButtons && (
+            <TouchableOpacity
+              style={[
+                styles.statusButton,
+                !isAdmin &&
+                  project.status !== "Faltando Informações" &&
+                  styles.disabledButton, // Estilo para indicar botão desativado
+              ]}
+              onPress={handleChat}
+              disabled={!isAdmin && project.status !== "Faltando Informações"} // Desativa para usuários comuns quando status é diferente de "Faltando Informações"
+            >
               <Text style={styles.statusButtonText}>
                 Adicionar mais informações
               </Text>

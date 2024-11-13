@@ -155,6 +155,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
   },
+  disabledButton: {
+    opacity: 0.5, 
+  }
 });
 
 export default styles;

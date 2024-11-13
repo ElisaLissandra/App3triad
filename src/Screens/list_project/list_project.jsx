@@ -23,6 +23,7 @@ const ProjectScreen = () => {
   const [showUrgentOnly, setShowUrgentOnly] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const currentUser = auth.currentUser;
   const navigation = useNavigation();
   const [buttonPosition, setButtonPosition] = useState({ x: 30, y: 600 });
@@ -80,7 +81,8 @@ const ProjectScreen = () => {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           const isAdmin = userData.isAdmin || false; // Verifica se o usuário é admin
-
+          setIsAdmin(isAdmin);
+          
           let projectsQuery;
 
           if (isAdmin) {
@@ -284,21 +286,23 @@ const ProjectScreen = () => {
       </View>
 
       {/* Botão flutuante para adicionar projetos com movimento */}
-      <View
-        {...panResponder.panHandlers}
-        style={[
-          styles.addButton,
-          {
-            position: "absolute",
-            left: buttonPosition.x,
-            top: buttonPosition.y,
-          },
-        ]}
-      >
-        <TouchableOpacity onPress={() => navigation.navigate("RequestProject")}>
-          <FontAwesome5 name="plus" size={24} color="#ffffff" />
-        </TouchableOpacity>
-      </View>
+      {!isAdmin && (
+        <View
+          {...panResponder.panHandlers}
+          style={[
+            styles.addButton,
+            {
+              position: "absolute",
+              left: buttonPosition.x,
+              top: buttonPosition.y,
+            },
+          ]}
+        >
+          <TouchableOpacity onPress={() => navigation.navigate("RequestProject")}>
+            <FontAwesome5 name="plus" size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       <FilterModal
         visible={isModalVisible}
