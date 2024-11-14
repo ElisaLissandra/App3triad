@@ -100,7 +100,7 @@ const DetailsProjectScreen = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0097B2" />
+        <ActivityIndicator size={50} color="#0097B2" />
       </View>
     );
   }

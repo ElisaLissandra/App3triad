@@ -80,17 +80,16 @@ const ChatScreen = () => {
     setIsPopupVisible(false);
   };
 
-  
   // Função para enviar arquivo
   const sendFile = async () => {
     const pickerResult = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-  
+
     console.log("Resultado da seleção do arquivo:", pickerResult); // Verifique a estrutura completa
-  
+
     // Verifica se o resultado é um sucesso e se existem arquivos selecionados
     if (pickerResult?.canceled === false && pickerResult?.assets?.length > 0) {
       console.log("Arquivo selecionado:", pickerResult.assets[0]); // Log para verificar o arquivo selecionado
-  
+
       const newFileMessage = {
         id: String(messages.length + 1),
         file: {
@@ -102,12 +101,15 @@ const ChatScreen = () => {
       };
       setMessages([...messages, newFileMessage]); // Atualiza as mensagens
     } else {
-      console.log("Erro ao selecionar arquivo ou operação cancelada", pickerResult);
+      console.log(
+        "Erro ao selecionar arquivo ou operação cancelada",
+        pickerResult
+      );
     }
-  
+
     setIsPopupVisible(false); // Fecha o popup após a seleção
   };
-  
+
   // Função para renderizar cada item da lista de mensagens
   const renderItem = ({ item }) => {
     return (
