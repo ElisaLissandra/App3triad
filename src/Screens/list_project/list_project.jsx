@@ -9,7 +9,14 @@ import {
   PanResponder,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { auth } from "../../../firebase-config";
 import styles from "./styles";
@@ -82,7 +89,7 @@ const ProjectScreen = () => {
           const userData = userDoc.data();
           const isAdmin = userData.isAdmin || false; // Verifica se o usuário é admin
           setIsAdmin(isAdmin);
-          
+
           let projectsQuery;
 
           if (isAdmin) {
@@ -286,7 +293,7 @@ const ProjectScreen = () => {
       </View>
 
       {/* Botão flutuante para adicionar projetos com movimento */}
-      {!isAdmin && (
+      {!isAdmin && !loading && (
         <View
           {...panResponder.panHandlers}
           style={[
@@ -298,7 +305,9 @@ const ProjectScreen = () => {
             },
           ]}
         >
-          <TouchableOpacity onPress={() => navigation.navigate("RequestProject")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("RequestProject")}
+          >
             <FontAwesome5 name="plus" size={24} color="#ffffff" />
           </TouchableOpacity>
         </View>

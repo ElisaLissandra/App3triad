@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  messagesList: {
+  /* messagesList: {
     paddingBottom: 80,
     paddingTop: 10,
   },
@@ -34,6 +34,26 @@ const styles = StyleSheet.create({
   botMessage: {
     alignSelf: "flex-start",
     backgroundColor: "#8c8c8c",
+  },
+  messageText: {
+    color: "#fff",
+    fontSize: 16,
+  }, */
+  messageContainer: {
+    marginVertical: 5,
+    maxWidth: "70%",
+    borderRadius: 10,
+    padding: 10,
+  },
+  userMessage: {
+    backgroundColor: "#0097B2",
+    alignSelf: "flex-end", 
+    color: "#fff",
+  },
+  recipientMessage: {
+    backgroundColor: "#8c8c8c",
+    alignSelf: "flex-start", 
+    color: "#000",
   },
   messageText: {
     color: "#fff",

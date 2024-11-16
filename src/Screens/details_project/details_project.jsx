@@ -94,7 +94,7 @@ const DetailsProjectScreen = () => {
   };
 
   const handleChat = () => {
-    navigation.navigate("Chat");
+    navigation.navigate("Chat", {project});
   };
 
   if (isLoading) {

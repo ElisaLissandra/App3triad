@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { auth } from '../../../firebase-config'; 
 import { doc, getDoc } from "firebase/firestore"; 
 import { db } from "../../../firebase-config";
+
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);

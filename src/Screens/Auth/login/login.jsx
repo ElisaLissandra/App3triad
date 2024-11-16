@@ -1,21 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styles from "./styles";
-import { useNavigation,  useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
-import {
-  GoogleAuthProvider,
-  signInWithCredential,
-} from "firebase/auth";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../../../../firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -23,7 +14,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  
+
   const handleRegister = () => {
     navigation.navigate("Register");
   };
@@ -34,7 +25,8 @@ const LoginScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
+    clientId:
+      "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
     redirectUri: "https://auth.expo.io/@elisa_expo/App3triad",
   });
 
@@ -49,6 +41,7 @@ const LoginScreen = () => {
         })
         .catch((error) => {
           console.error("Erro ao autenticar com Google:", error);
+          Alert.alert("Erro", "Não foi possível autenticar com o Google.");
         });
     }
   }, [response]);
@@ -74,7 +67,7 @@ const LoginScreen = () => {
 
   const checkIfUserIsAdmin = async (uid) => {
     try {
-      const userDocRef = doc(db, 'users', uid);
+      const userDocRef = doc(db, "users", uid);
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
         const userData = userDoc.data();
@@ -138,7 +131,9 @@ const LoginScreen = () => {
           />
         </TouchableOpacity>
       </View>
-      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
       <Text style={styles.link}>Esqueceu a senha?</Text>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
