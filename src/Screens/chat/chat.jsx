@@ -22,13 +22,12 @@ import {
   addDoc,
   serverTimestamp,
   query,
-  orderBy
+  orderBy,
 } from "firebase/firestore";
 import { doc, getDoc } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
 import { onSnapshot } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
 
 const ChatScreen = () => {
   const route = useRoute();
@@ -140,45 +139,43 @@ const ChatScreen = () => {
     setIsPopupVisible(false);
   }; */
 
-
-const sendImage = async () => {
-  const permissionResult =
-    await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permissionResult.granted) {
-    alert("É necessário permitir o acesso à galeria para enviar imagens.");
-    return;
-  }
-
-  const pickerResult = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images, 
-    quality: 1,
-  });
-
-  if (!pickerResult.canceled && pickerResult.assets?.length > 0) {
-    try {
-      const storage = getStorage();
-      const imageUri = pickerResult.assets[0].uri;
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-
-      const imageRef = ref(storage, `images/${Date.now()}-${userId}`);
-      await uploadBytes(imageRef, blob);
-      const imageUrl = await getDownloadURL(imageRef);
-
-      const db = getFirestore();
-      await addDoc(collection(db, "chats", project.id, "messages"), {
-        image: imageUrl, // URL da imagem
-        senderId: userId,
-        recipientId: recipientId,
-        timestamp: serverTimestamp(),
-      });
-    } catch (error) {
-      console.error("Erro ao enviar imagem:", error);
+  const sendImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("É necessário permitir o acesso à galeria para enviar imagens.");
+      return;
     }
-  }
-  setIsPopupVisible(false);
-};
 
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled && pickerResult.assets?.length > 0) {
+      try {
+        const storage = getStorage();
+        const imageUri = pickerResult.assets[0].uri;
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+
+        const imageRef = ref(storage, `images/${Date.now()}-${userId}`);
+        await uploadBytes(imageRef, blob);
+        const imageUrl = await getDownloadURL(imageRef);
+
+        const db = getFirestore();
+        await addDoc(collection(db, "chats", project.id, "messages"), {
+          image: imageUrl, // URL da imagem
+          senderId: userId,
+          recipientId: recipientId,
+          timestamp: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Erro ao enviar imagem:", error);
+      }
+    }
+    setIsPopupVisible(false);
+  };
 
   // Função para enviar arquivo
   const sendFile = async () => {
@@ -186,20 +183,42 @@ const sendImage = async () => {
 
     console.log("Resultado da seleção do arquivo:", pickerResult); // Verifique a estrutura completa
 
-    // Verifica se o resultado é um sucesso e se existem arquivos selecionados
-    if (pickerResult?.canceled === false && pickerResult?.assets?.length > 0) {
-      console.log("Arquivo selecionado:", pickerResult.assets[0]); // Log para verificar o arquivo selecionado
+    // Verifica se o resultado é um sucesso e se existe um arquivo selecionado
+    if (!pickerResult.canceled && pickerResult.assets?.length > 0) {
+      const file = pickerResult.assets[0]; // Acessa o arquivo selecionado
 
-      const newFileMessage = {
-        id: String(messages.length + 1),
-        file: {
-          uri: pickerResult.assets[0].uri,
-          name: pickerResult.assets[0].name,
-          type: pickerResult.assets[0].mimeType,
-        },
-        sender: userId,
-      };
-      setMessages([...messages, newFileMessage]); // Atualiza as mensagens
+      console.log("Arquivo selecionado:", file); // Log para verificar o arquivo selecionado
+
+      try {
+        const storage = getStorage();
+        const fileUri = file.uri;
+        const response = await fetch(fileUri);
+        const blob = await response.blob();
+
+        // Cria uma referência única para o arquivo no Firebase Storage
+        const fileRef = ref(
+          storage,
+          `files/${Date.now()}-${userId}-${file.name}`
+        );
+        await uploadBytes(fileRef, blob);
+
+        // Obtém a URL do arquivo enviado
+        const fileUrl = await getDownloadURL(fileRef);
+
+        // Envia a URL do arquivo e o nome do arquivo para o Firestore
+        const db = getFirestore();
+        await addDoc(collection(db, "chats", project.id, "messages"), {
+          file: fileUrl, // URL do arquivo
+          fileName: file.name, // Nome do arquivo
+          senderId: userId,
+          recipientId: recipientId,
+          timestamp: serverTimestamp(),
+        });
+
+        console.log("Arquivo enviado com sucesso!");
+      } catch (error) {
+        console.error("Erro ao enviar o arquivo:", error);
+      }
     } else {
       console.log(
         "Erro ao selecionar arquivo ou operação cancelada",
@@ -231,9 +250,11 @@ const sendImage = async () => {
           </TouchableOpacity>
         ) : item.file ? (
           <TouchableOpacity
-            onPress={() => alert(`Abrir arquivo: ${item.file.name}`)}
+            onPress={() => alert(`Abrir arquivo: ${item.fileName}`)}
           >
-            <Text style={styles.messageText}>📄 {item.file.name}</Text>
+            <Text style={styles.messageText}>
+              📄 {item.fileName} {/* Exibe o nome do arquivo */}
+            </Text>
           </TouchableOpacity>
         ) : (
           <Text style={styles.messageText}>{item.text}</Text>
