@@ -22,17 +22,17 @@ import {
   addDoc,
   serverTimestamp,
   query,
-  orderBy,
-  querySnapshot,
+  orderBy
 } from "firebase/firestore";
 import { doc, getDoc } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
 import { onSnapshot } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 const ChatScreen = () => {
   const route = useRoute();
   const { project } = route.params;
-  // console.log("Project", project);
   const [userId, setUserId] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -106,7 +106,7 @@ const ChatScreen = () => {
   }, [project.id]);
 
   // Função para enviar imagem
-  const sendImage = async () => {
+  /* const sendImage = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     console.log("Permissão concedida:", permissionResult.granted); // Log de permissão
@@ -138,7 +138,47 @@ const ChatScreen = () => {
       console.log("Nenhuma imagem selecionada ou erro ao selecionar imagem");
     }
     setIsPopupVisible(false);
-  };
+  }; */
+
+
+const sendImage = async () => {
+  const permissionResult =
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permissionResult.granted) {
+    alert("É necessário permitir o acesso à galeria para enviar imagens.");
+    return;
+  }
+
+  const pickerResult = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+    quality: 1,
+  });
+
+  if (!pickerResult.canceled && pickerResult.assets?.length > 0) {
+    try {
+      const storage = getStorage();
+      const imageUri = pickerResult.assets[0].uri;
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+
+      const imageRef = ref(storage, `images/${Date.now()}-${userId}`);
+      await uploadBytes(imageRef, blob);
+      const imageUrl = await getDownloadURL(imageRef);
+
+      const db = getFirestore();
+      await addDoc(collection(db, "chats", project.id, "messages"), {
+        image: imageUrl, // URL da imagem
+        senderId: userId,
+        recipientId: recipientId,
+        timestamp: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("Erro ao enviar imagem:", error);
+    }
+  }
+  setIsPopupVisible(false);
+};
+
 
   // Função para enviar arquivo
   const sendFile = async () => {
