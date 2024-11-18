@@ -94,7 +94,7 @@ const DetailsProjectScreen = () => {
   };
 
   const handleChat = () => {
-    navigation.navigate("Chat", {project});
+    navigation.navigate("Chat", { project });
   };
 
   if (isLoading) {
@@ -328,7 +328,7 @@ const DetailsProjectScreen = () => {
             </>
           )}
 
-          {!showAcceptRejectButtons && (
+          {/* {!showAcceptRejectButtons && (
             <TouchableOpacity
               style={[
                 styles.statusButton,
@@ -343,6 +343,24 @@ const DetailsProjectScreen = () => {
                 Adicionar mais informações
               </Text>
             </TouchableOpacity>
+          )} */}
+          {!showAcceptRejectButtons && (
+            <View style={styles.statusButtonContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.statusButton,
+                  !isAdmin &&
+                    project.status !== "Faltando Informações" &&
+                    styles.disabledButton,
+                ]}
+                onPress={handleChat}
+                disabled={!isAdmin && project.status !== "Faltando Informações"}
+              >
+                <Text style={styles.statusButtonText}>
+                  Adicionar mais informações
+                </Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </ScrollView>

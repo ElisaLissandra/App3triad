@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
   },
   headerContainer: {
     marginTop: 40,
@@ -114,12 +114,25 @@ const styles = StyleSheet.create({
     color: "#6c6c6c",
     marginBottom: 15,
   },
-  statusButton: {
+  /* statusButton: {
     backgroundColor: "#0097B2",
     padding: 15,
     alignItems: "center",
     borderRadius: 8,
     marginTop: 20,
+  }, */
+  statusButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingBottom: 20, // Espaço adicional se necessário
+  },
+  statusButton: {
+    backgroundColor: "#0097B2",
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
   },
   statusButtonText: {
     color: "#ffffff",
@@ -156,8 +169,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   disabledButton: {
-    opacity: 0.5, 
-  }
+    opacity: 0.5,
+  },
 });
 
 export default styles;
