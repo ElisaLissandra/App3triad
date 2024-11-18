@@ -294,7 +294,7 @@ const ProjectScreen = () => {
               );
             })
           ) : (
-            <Text>Nenhum projeto encontrado.</Text>
+            <Text style={styles.textNoProjects}>Nenhum projeto encontrado</Text>
           )}
         </ScrollView>
       </View>

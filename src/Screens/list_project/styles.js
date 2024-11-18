@@ -158,6 +158,13 @@ const styles = StyleSheet.create({
   urgentBorder: {
     borderColor: "#fecaca", 
   },
+  textNoProjects:{ flex: 1,
+    textAlign: "center",
+    alignSelf: "center",
+    marginTop: 220, 
+    color: "#888", 
+    fontSize: 16,
+  }
 
 });
 
