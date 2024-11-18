@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   PanResponder,
+  ActivityIndicator
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
@@ -224,7 +225,13 @@ const ProjectScreen = () => {
           style={styles.projectsListContainer}
           showsVerticalScrollIndicator={false}
         >
-          {filteredProjects.length > 0 ? (
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color="#0097B2"
+              style={styles.activityIndicator}
+            />
+          ) : filteredProjects.length > 0 ? (
             filteredProjects.map((project) => {
               const status = projectStatuses.find(
                 (status) => status.key === project.status
@@ -264,7 +271,7 @@ const ProjectScreen = () => {
                           </Text>
                         </TouchableOpacity>
 
-                        {status ? ( // Verifica se encontrou o status
+                        {status ? (
                           <View
                             style={[
                               styles.statusContainer,
@@ -278,7 +285,7 @@ const ProjectScreen = () => {
                             />
                           </View>
                         ) : (
-                          <Text>Status desconhecido</Text> // Opcional: Exibe mensagem se o status não for encontrado
+                          <Text>Status desconhecido</Text>
                         )}
                       </View>
                     </View>
