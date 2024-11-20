@@ -36,7 +36,6 @@ const DetailsProjectScreen = () => {
   const [projectUser, setProjectUser] = useState(null);
   const navigation = useNavigation();
   const [isAdmin, setIsAdmin] = useState(false);
-  //const userId = project.userId;
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -214,9 +213,8 @@ const DetailsProjectScreen = () => {
             </TouchableOpacity>
             <Text style={styles.title}>Detalhes do projeto</Text>
           </View>
-
           {/* Informações do Usuário */}
-          {isAdmin && (
+          {isAdmin && projectUser && (
             <>
               <Text style={styles.subHeader}>Informações do Usuário</Text>
               <View style={styles.userInfoContainer}>
@@ -234,10 +232,8 @@ const DetailsProjectScreen = () => {
               <Text style={styles.subHeader}>Informações do Projeto</Text>
             </>
           )}
-
           <Text style={styles.sectionTitle}>Título do projeto</Text>
           <Text style={styles.titleProject}>{title}</Text>
-
           <Text style={styles.sectionTitle}>Status do projeto</Text>
           {isAdmin ? (
             <Picker
@@ -262,7 +258,6 @@ const DetailsProjectScreen = () => {
           ) : (
             <Text style={styles.titleProject}>{selectedStatus}</Text>
           )}
-
           {/* Section de arquivos */}
           <Text style={styles.sectionTitle}>Baixar arquivo</Text>
           {Array.isArray(files) && files.length > 0 ? (
@@ -282,7 +277,6 @@ const DetailsProjectScreen = () => {
           ) : (
             <Text>Nenhum arquivo disponível</Text>
           )}
-
           {/* Data e status de urgência */}
           <View style={styles.dateContainer}>
             <FontAwesome5 name="calendar-alt" size={20} color="#0097B2" />
@@ -299,69 +293,50 @@ const DetailsProjectScreen = () => {
               </View>
             )}
           </View>
-
           {/* Descrição do projeto */}
           <Text style={styles.sectionTitle}>Descrição do projeto</Text>
           <Text style={styles.descriptionText}>{description}</Text>
-
           {/* Contexto do projeto */}
           <Text style={styles.sectionTitle}>Contexto do projeto</Text>
           <Text style={styles.descriptionText}>{generalContext}</Text>
-
           {/* Botão Acompanhar status */}
+          {/* Botões de aceitar e recusar */}
           {showAcceptRejectButtons && isAdmin && (
-            <>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.rejectButton}
-                  onPress={() => handleStatusChange("Recusado")}
-                >
-                  <Text style={styles.buttonText}>Recusar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.acceptButton}
-                  onPress={() => handleStatusChange("Aceito")}
-                >
-                  <Text style={styles.buttonText}>Aceitar</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-
-          {/* {!showAcceptRejectButtons && (
-            <TouchableOpacity
-              style={[
-                styles.statusButton,
-                !isAdmin &&
-                  project.status !== "Faltando Informações" &&
-                  styles.disabledButton, // Estilo para indicar botão desativado
-              ]}
-              onPress={handleChat}
-              disabled={!isAdmin && project.status !== "Faltando Informações"} // Desativa para usuários comuns quando status é diferente de "Faltando Informações"
-            >
-              <Text style={styles.statusButtonText}>
-                Adicionar mais informações
-              </Text>
-            </TouchableOpacity>
-          )} */}
-          {!showAcceptRejectButtons && (
-            <View style={styles.statusButtonContainer}>
+            <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[
-                  styles.statusButton,
-                  !isAdmin &&
-                    project.status !== "Faltando Informações" &&
-                    styles.disabledButton,
+                  styles.rejectButton,
+                  selectedStatus === "Recusado" && styles.disabledButton, // Estilo desabilitado
                 ]}
+                onPress={() => handleStatusChange("Recusado")}
+                disabled={selectedStatus === "Recusado"} // Desabilita o botão se já estiver recusado
+              >
+                <Text style={styles.buttonText}>Recusar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.acceptButton,
+                  selectedStatus === "Recusado" && styles.disabledButton, // Estilo desabilitado
+                ]}
+                onPress={() => handleStatusChange("Aceito")}
+                disabled={selectedStatus === "Recusado"} // Desabilita o botão se o status for "Recusado"
+              >
+                <Text style={styles.buttonText}>Aceitar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <View>
+            {selectedStatus === "Faltando Informações" && (
+              <TouchableOpacity
+                style={styles.statusButton}
                 onPress={handleChat}
-                disabled={!isAdmin && project.status !== "Faltando Informações"}
               >
                 <Text style={styles.statusButtonText}>
                   Adicionar mais informações
                 </Text>
               </TouchableOpacity>
-            </View>
-          )}
+            )}
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

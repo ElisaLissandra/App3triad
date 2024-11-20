@@ -7,7 +7,7 @@ import {
   Alert,
   ScrollView,
   PanResponder,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
@@ -183,6 +183,15 @@ const ProjectScreen = () => {
     setIsModalVisible(false);
   };
 
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      fetchProjects(user.uid);
+    } else {
+      console.error("Nenhum usuário está conectado no momento.");
+    }
+  });
+  
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -226,11 +235,13 @@ const ProjectScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           {loading ? (
-            <ActivityIndicator
-              size="large"
-              color="#0097B2"
-              style={styles.activityIndicator}
-            />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator
+                size="large"
+                color="#0097B2"
+                style={styles.activityIndicator}
+              />
+            </View>
           ) : filteredProjects.length > 0 ? (
             filteredProjects.map((project) => {
               const status = projectStatuses.find(

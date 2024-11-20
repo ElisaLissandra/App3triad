@@ -164,7 +164,14 @@ const styles = StyleSheet.create({
     marginTop: 220, 
     color: "#888", 
     fontSize: 16,
-  }
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: "#FFFFFF",
+    marginTop: 220, 
+  },
 
 });
 

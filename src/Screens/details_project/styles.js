@@ -146,14 +146,14 @@ const styles = StyleSheet.create({
   },
   rejectButton: {
     backgroundColor: "#E74C3C",
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
     flex: 1, // Ensures buttons take equal space
     marginRight: 10,
   },
   acceptButton: {
     backgroundColor: "#27AE60",
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
     flex: 1, // Ensures buttons take equal space
   },
