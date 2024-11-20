@@ -38,6 +38,7 @@ const DetailsProjectScreen = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
 
   const getUserById = async (userId) => {
     try {
@@ -100,6 +101,14 @@ const DetailsProjectScreen = () => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size={50} color="#0097B2" />
+      </View>
+    );
+  }
+
+  if (isStatusUpdating) {
+    return (
+      <View style={styles.loadingOverlay}>
+        <ActivityIndicator size="large" color="#0097B2" />
       </View>
     );
   }
@@ -175,7 +184,7 @@ const DetailsProjectScreen = () => {
     }
   };
 
-  const handleStatusChange = async (newStatus) => {
+  /* const handleStatusChange = async (newStatus) => {
     setSelectedStatus(newStatus); // Atualiza o estado local com o novo status
 
     try {
@@ -186,6 +195,24 @@ const DetailsProjectScreen = () => {
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       Alert.alert("Erro", "Não foi possível atualizar o status."); // Exibe mensagem de erro
+    }
+  };
+ */
+
+  const handleStatusChange = async (newStatus) => {
+    setIsStatusUpdating(true); // Ativa o indicador
+    setSelectedStatus(newStatus); // Atualiza o estado local com o novo status
+
+    try {
+      const projectRef = doc(db, "projects", project.id); // Referência do documento do projeto
+      await updateDoc(projectRef, { status: newStatus }); // Atualiza o campo "status" no Firestore
+
+      Alert.alert("Sucesso", "Status atualizado com sucesso."); // Exibe mensagem de sucesso
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o status."); // Exibe mensagem de erro
+    } finally {
+      setIsStatusUpdating(false); // Desativa o indicador
     }
   };
 
@@ -234,6 +261,7 @@ const DetailsProjectScreen = () => {
           )}
           <Text style={styles.sectionTitle}>Título do projeto</Text>
           <Text style={styles.titleProject}>{title}</Text>
+
           <Text style={styles.sectionTitle}>Status do projeto</Text>
           {isAdmin ? (
             <Picker
@@ -258,6 +286,7 @@ const DetailsProjectScreen = () => {
           ) : (
             <Text style={styles.titleProject}>{selectedStatus}</Text>
           )}
+
           {/* Section de arquivos */}
           <Text style={styles.sectionTitle}>Baixar arquivo</Text>
           {Array.isArray(files) && files.length > 0 ? (
