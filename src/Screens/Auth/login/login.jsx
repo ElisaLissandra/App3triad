@@ -1,4 +1,16 @@
 import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ScrollView,
+  Platform,
+} from "react-native";
 import styles from "./styles";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as Google from "expo-auth-session/providers/google";
@@ -6,7 +18,6 @@ import * as WebBrowser from "expo-web-browser";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../../../../firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -104,54 +115,65 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>3triad</Text>
-      <Text style={styles.label}>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-      />
-      <Text style={styles.label}>Senha:</Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.inputPassword}
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <TouchableOpacity
-          onPress={() => setShowPassword((prev) => !prev)}
-          style={styles.eyeIcon}
+    <KeyboardAvoidingView
+     style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} // Ajuste o deslocamento no iOS
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
         >
-          <FontAwesome5
-            name={showPassword ? "eye" : "eye-slash"}
-            size={24}
-            color="black"
-          />
-        </TouchableOpacity>
-      </View>
-      {errorMessage ? (
-        <Text style={styles.errorText}>{errorMessage}</Text>
-      ) : null}
-      <Text style={styles.link}>Esqueceu a senha?</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
-
-      <View style={styles.googleButton}>
-        <TouchableOpacity onPress={() => promptAsync()}>
-          <Text style={styles.googleButtonText}>Acessar com Google</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.linkLogin}>
-        Não tem uma conta?{" "}
-        <Text style={styles.LoginButton} onPress={handleRegister}>
-          Cadastre-se
-        </Text>
-      </Text>
-    </View>
+          <View style={styles.inner}>
+            <Text style={styles.title}>3triad</Text>
+            <Text style={styles.label}>Email:</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
+            <Text style={styles.label}>Senha:</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.inputPassword}
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword((prev) => !prev)}
+                style={styles.eyeIcon}
+              >
+                <FontAwesome5
+                  name={showPassword ? "eye" : "eye-slash"}
+                  size={20}
+                  color="#ccc"
+                />
+              </TouchableOpacity>
+            </View>
+            {errorMessage ? (
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            ) : null}
+            <Text style={styles.link}>Esqueceu a senha?</Text>
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Entrar</Text>
+            </TouchableOpacity>
+            <View style={styles.googleButton}>
+              <TouchableOpacity onPress={() => promptAsync()}>
+                <Text style={styles.googleButtonText}>Acessar com Google</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.linkLogin}>
+              Não tem uma conta?{" "}
+              <Text style={styles.LoginButton} onPress={handleRegister}>
+                Cadastre-se
+              </Text>
+            </Text>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

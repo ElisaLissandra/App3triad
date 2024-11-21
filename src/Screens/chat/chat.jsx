@@ -23,10 +23,11 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  doc,
+  getDoc,
+  onSnapshot,
 } from "firebase/firestore";
-import { doc, getDoc } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
-import { onSnapshot } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const ChatScreen = () => {
@@ -39,26 +40,84 @@ const ChatScreen = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false); // Estado para controlar o modal da imagem
   const [selectedImage, setSelectedImage] = useState(null); // Estado para armazenar a imagem selecionada
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [requesterName, setRequesterName] = useState("");
 
   // Recuperar o ID do usuário logado
   useEffect(() => {
     const auth = getAuth();
+    const firestore = getFirestore();
     const currentUser = auth.currentUser;
 
     if (currentUser) {
       setUserId(currentUser.uid); // Define o UID do usuário logado no estado
       console.log("Usuário logado:", currentUser.uid);
+
+      // Busca o status de admin no Firestore
+      const userDocRef = doc(firestore, "users", currentUser.uid); // Ajuste o caminho conforme sua estrutura
+      getDoc(userDocRef)
+        .then((docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const userData = docSnapshot.data();
+            if (userData.isAdmin) {
+              setIsAdmin(true); // Define como admin
+            } else {
+              setIsAdmin(false); // Não é admin
+              console.log("Usuário não é administrador.");
+            }
+          } else {
+            console.log("Documento do usuário não encontrado.");
+          }
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar dados do usuário:", error);
+        });
     } else {
       console.log("Nenhum usuário está logado.");
     }
   }, []);
 
   // UseEffect para configurar o recipientId com base no projeto
-  useEffect(() => {
+  /* useEffect(() => {
     if (project) {
       setRecipientId(project.userId); // Assuming project has a userId field
     }
-  }, [project]);
+  }, [project]); */
+
+  useEffect(() => {
+    const fetchRequesterName = async () => {
+      try {
+        const db = getFirestore();
+        const projectDocRef = doc(db, "projects", project.id); // Ajuste o caminho conforme sua estrutura
+        const projectSnapshot = await getDoc(projectDocRef);
+
+        if (projectSnapshot.exists()) {
+          const projectData = projectSnapshot.data();
+          const userId = projectData.userId;
+
+          if (userId) {
+            const userDocRef = doc(db, "users", userId); // Ajuste o caminho conforme sua estrutura
+            const userSnapshot = await getDoc(userDocRef);
+
+            if (userSnapshot.exists()) {
+              const userData = userSnapshot.data();
+              setRequesterName(userData.fullName); // Atualize o nome do solicitante
+            } else {
+              console.log("Usuário não encontrado.");
+            }
+          }
+        } else {
+          console.log("Projeto não encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar o nome do solicitante:", error);
+      }
+    };
+
+    if (project?.id) {
+      fetchRequesterName();
+    }
+  }, [project?.id]);
 
   const sendMessage = async () => {
     console.log("Mensagem:", message);
@@ -281,7 +340,7 @@ const ChatScreen = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Chat</Text>
+        <Text style={styles.headerTitle}>{isAdmin ? requesterName : "3triad"}</Text>
       </View>
 
       <FlatList
@@ -309,27 +368,6 @@ const ChatScreen = () => {
           <Ionicons name="send" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-
-      {/* Modal para popup de seleção de imagem ou arquivo */}
-      <Modal
-        transparent={true}
-        visible={isPopupVisible}
-        animationType="slide"
-        onRequestClose={() => setIsPopupVisible(false)}
-      >
-        <View style={styles.popupContainer}>
-          <View style={styles.popup}>
-            <TouchableOpacity onPress={sendImage} style={styles.popupOption}>
-              <Ionicons name="image" size={30} color="#0097B2" />
-              <Text>Imagem</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={sendFile} style={styles.popupOption}>
-              <Ionicons name="document" size={30} color="#0097B2" />
-              <Text>Arquivo</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
 
       {/* Modal para popup de seleção de imagem ou arquivo */}
       <Modal

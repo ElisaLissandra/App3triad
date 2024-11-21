@@ -2,28 +2,35 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    flexGrow: 1,
     backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+  },
+  scrollContainer: {
+    flexGrow: 1, 
+    marginTop: 110,
+    justifyContent: 'flex-start',
   },
   inner: {
-    flex: 1,
-    justifyContent: "center",
+    flexGrow: 1, 
+    justifyContent: "flex-start", 
+    alignItems: "center",
     padding: 20,
+    backgroundColor: "#FFFFFF",
   },
   title: {
     fontSize: 50,
     fontWeight: "bold",
     color: "#0097B2",
     marginBottom: 80,
+    justifyContent: "center",
   },
   label: {
     width: "80%",
     textAlign: 'left',
     fontSize: 16,
     marginBottom: 5,
-    color: '#1E1E1E', 
+    color: '#303030', 
     marginLeft: 10,
   },
   input: {
@@ -34,7 +41,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 20,
-    backgroundColor: "#fff",
+    /* backgroundColor: "#fff", */
   },
   button: {
     width: "80%",
@@ -43,8 +50,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 15,
+    marginTop: 40,
   },
   buttonText: {
     color: "#FFFFFF", 
@@ -93,10 +100,11 @@ const styles = StyleSheet.create({
   },
   passwordContainer: {
     width: "80%",
+    height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#E5E5E5',
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 15,
