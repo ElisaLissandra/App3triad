@@ -8,6 +8,7 @@ import {
   addDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   FlatList,
   Text,
@@ -18,6 +19,7 @@ import {
   TouchableOpacity,
   Image,
   Modal,
+  Alert,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
@@ -26,22 +28,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "../../Context/UserContext";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 
 const CommentProjectScreen = () => {
   const { userData } = useContext(UserContext);
   const route = useRoute();
   const { project } = route.params;
   const projectId = project.id;
-  console.log(projectId);
   const [comment, setComment] = useState([]);
   const [newComment, setNewComment] = useState("");
   const db = getFirestore();
   const auth = getAuth();
   const user = auth.currentUser;
-  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  //const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  //const [selectedImage, setSelectedImage] = useState(null);
 
   // Função para enviar o comentário
   const handleAddComment = async () => {
@@ -79,24 +81,53 @@ const CommentProjectScreen = () => {
       try {
         const storage = getStorage();
         const imageUri = pickerResult.assets[0].uri;
+        let imageName =
+          pickerResult.assets[0].imageName || `image-${Date.now()}`;
+
+        console.log("Nome da imagem:", imageName);
+
+        // Função para extrair a extensão da URL ou do nome do arquivo
+        const getExtensionFromUri = (uri) => {
+          const regex = /(?:\.([^.]+))?$/; // Regex para encontrar a extensão
+          const result = uri.match(regex); // Tenta extrair a extensão da URL
+
+          return result && result[1] ? result[1] : ""; // Se encontrar a extensão, retorna; caso contrário, retorna vazio
+        };
+
+        // Extrair a extensão da imagem
+        const imageExtension = getExtensionFromUri(imageUri);
+
+        // Se não tiver a extensão, adicione-a ao nome da imagem
+        if (imageExtension && !imageName.includes(imageExtension)) {
+          imageName = `${imageName}.${imageExtension}`;
+        }
+
+        console.log("Nome final da imagem:", imageName);
+
         const response = await fetch(imageUri);
         const blob = await response.blob();
 
+        // Criar referência única no Firebase Storage
         const imageRef = ref(storage, `images/${Date.now()}-${user.uid}`);
         await uploadBytes(imageRef, blob);
 
         const imageUrl = await getDownloadURL(imageRef);
 
+        // Salvar dados no Firestore
         await addDoc(collection(db, `projects/${projectId}/comment`), {
-          image: imageUrl,
+          image: imageUrl, // URL da imagem
+          imageName: imageName, // Nome da imagem com a extensão
           user: userData?.displayName,
           timestamp: serverTimestamp(),
         });
+
+        console.log("Imagem enviada com sucesso!");
       } catch (error) {
         console.error("Erro ao enviar imagem:", error);
       }
     }
-    setIsPopupVisible(false);
+
+    setIsPopupVisible(false); // Fecha o popup após o envio
   };
 
   // Função para enviar arquivo
@@ -160,12 +191,94 @@ const CommentProjectScreen = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("Comentários recebidos:", commentData);
       setComment(commentData);
     });
 
     return () => unsubscribe(); // Limpa o listener ao desmontar o componente
   }, [projectId]);
+
+  // Função para fazer o download e salvar a imagem na galeria
+  const downloadImage = async (imageUri, imageName) => {
+    try {
+      const fileExtension = imageName.split(".").pop();
+      const downloadUri = FileSystem.documentDirectory + imageName;
+
+      const { uri } = await FileSystem.downloadAsync(imageUri, downloadUri);
+
+      const permission = await MediaLibrary.requestPermissionsAsync();
+      if (permission.granted) {
+        const asset = await MediaLibrary.createAssetAsync(uri);
+        await MediaLibrary.createAlbumAsync("Download", asset, false);
+
+        alert("Imagem salva na galeria com sucesso!");
+      } else {
+        alert("Permissão de acesso à galeria não concedida.");
+      }
+    } catch (error) {
+      console.error("Erro ao fazer o download da imagem:", error);
+      alert("Erro ao tentar baixar a imagem.");
+    }
+  };
+
+  const downloadFile = async (fileUri, fileName) => {
+    try {
+      // Diretório temporário para baixar o arquivo
+      const downloadUri = FileSystem.documentDirectory + fileName;
+      const { uri } = await FileSystem.downloadAsync(fileUri, downloadUri);
+
+      // Solicitar permissão de acesso à biblioteca de mídia
+      const { granted } = await MediaLibrary.requestPermissionsAsync();
+      if (!granted) {
+        alert("Permissão para acessar a biblioteca de mídia foi negada.");
+        return;
+      }
+
+      // Salvar na pasta de Downloads ou na biblioteca de mídia
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      const album = await MediaLibrary.getAlbumAsync("Download");
+
+      if (album) {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      } else {
+        await MediaLibrary.createAlbumAsync("Download", asset, false);
+      }
+
+      alert("Arquivo baixado com sucesso");
+    } catch (error) {
+      console.error("Erro ao fazer o download do arquivo:", error);
+      alert("Erro ao tentar baixar o arquivo.");
+    }
+  };
+
+  const openImageModal = (imageUri, imageName) => {
+    // Exibe o alerta perguntando se o usuário deseja fazer o download
+    Alert.alert("Deseja baixar a imagem?", "", [
+      {
+        text: "Cancelar",
+        onPress: () => console.log("Download cancelado"),
+        style: "cancel",
+      },
+      {
+        text: "Sim",
+        onPress: () => downloadImage(imageUri, imageName),
+      },
+    ]);
+  };
+
+  const openFileModal = (fileUri, fileName) => {
+    // Exibe o alerta perguntando se o usuário deseja fazer o download
+    Alert.alert("Deseja baixar o arquivo?", "", [
+      {
+        text: "Cancelar",
+        onPress: () => console.log("Download cancelado"),
+        style: "cancel",
+      },
+      {
+        text: "Sim",
+        onPress: () => downloadFile(fileUri, fileName),
+      },
+    ]);
+  };
 
   // Função para renderizar os itens do comentário
   const renderItem = ({ item }) => {
@@ -185,7 +298,9 @@ const CommentProjectScreen = () => {
             <Text style={styles.userName}>
               {item.user || "Usuário Desconhecido"}{" "}
             </Text>
-            <TouchableOpacity onPress={() => openImageModal(item.image)}>
+            <TouchableOpacity
+              onPress={() => openImageModal(item.image, item.imageName)}
+            >
               <Image
                 key={item.id}
                 source={{ uri: item.image }}
@@ -207,7 +322,7 @@ const CommentProjectScreen = () => {
               {item.user || "Usuário Desconhecido"}{" "}
             </Text>
             <TouchableOpacity
-              onPress={() => alert(`Abrir arquivo: ${item.fileName}`)}
+              onPress={() => openFileModal(item.file, item.fileName)}
             >
               <Text style={styles.messageText}>
                 📄 {item.fileName || "Arquivo"}
@@ -233,12 +348,6 @@ const CommentProjectScreen = () => {
         )}
       </View>
     );
-  };
-
-  // Função para abrir o modal da imagem
-  const openImageModal = (imageUri) => {
-    setSelectedImage(imageUri);
-    setIsImageModalVisible(true);
   };
 
   // Função para fechar o modal da imagem
@@ -272,12 +381,6 @@ const CommentProjectScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
-        /* renderItem={({ item }) => (
-          <View style={{ marginBottom: 10 }}>
-            <Text style={{ fontWeight: "bold" }}>{item.user}</Text>
-            <Text>{item.message}</Text>
-          </View>
-        )} */
       />
 
       <View style={styles.inputContainer}>
