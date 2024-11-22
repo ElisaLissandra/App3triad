@@ -6,20 +6,23 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
-import { auth } from '../../../firebase-config'; 
-import { doc, getDoc } from "firebase/firestore"; 
+import { auth } from "../../../firebase-config";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchUserInfo = async (userId) => {
+    setIsLoading(true);
     try {
       const docRef = doc(db, "users", userId); // Referência do documento
       const docSnap = await getDoc(docRef); // Obtendo o documento
@@ -31,6 +34,8 @@ const SettingsScreen = () => {
       }
     } catch (error) {
       console.log("Erro ao buscar dados do usuário:", error);
+    } finally {
+      setIsLoading(false); // Finaliza o carregamento
     }
   };
 
@@ -74,32 +79,56 @@ const SettingsScreen = () => {
           </View>
 
           {/* Informações do Usuário */}
-          <Text style={styles.subHeader}>Informações do Usuário</Text>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Nome: </Text>
-            <Text style={styles.userInfo}>{user?.fullName}</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Data nascimento: </Text>
-            <Text style={styles.userInfo}>{user?.birthDate}</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Email: </Text>
-            <Text style={styles.userInfo}>{user?.email}</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.sectionTitle}>Contato: </Text>
-            <Text style={styles.userInfo}>{user?.contact}</Text>
-          </View>
+          {isLoading ? (
+            <ActivityIndicator
+              size="large"
+              color="#0097B2"
+              style={styles.loader}
+            />
+          ) : (
+            <>
+              {/* Informações do Usuário */}
+              <Text style={styles.subHeader}>Informações do Usuário</Text>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Nome: </Text>
+                <Text style={styles.userInfo}>
+                  {user?.displayName || "Não disponível"}
+                </Text>
+              </View>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Data nascimento: </Text>
+                <Text style={styles.userInfo}>
+                  {user?.birthDate || "Não disponível"}
+                </Text>
+              </View>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Email: </Text>
+                <Text style={styles.userInfo}>
+                  {user?.email || "Não disponível"}
+                </Text>
+              </View>
+              <View style={styles.userInfoContainer}>
+                <Text style={styles.sectionTitle}>Contato: </Text>
+                <Text style={styles.userInfo}>
+                  {user?.contact || "Não disponível"}
+                </Text>
+              </View>
 
-          {/* Botão de Logout */}
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
-            <Text style={styles.logoutText}>Sair</Text>
-            <FontAwesome5 name="sign-out-alt" size={18} color="#fff" style={styles.logoutIcon} />
-          </TouchableOpacity>
+              {/* Botão de Logout */}
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+              >
+                <Text style={styles.logoutText}>Sair</Text>
+                <FontAwesome5
+                  name="sign-out-alt"
+                  size={18}
+                  color="#fff"
+                  style={styles.logoutIcon}
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -24,7 +24,7 @@ const RegisterScreen = () => {
   const db = getFirestore();
 
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +55,7 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     // Validações
-    if (!email || !fullName || !birthDate || !contact || !password || !confirmPassword) {
+    if (!email || !displayName || !birthDate || !contact || !password || !confirmPassword) {
       Alert.alert("Erro", "Todos os campos são obrigatórios.");
       return;
     }
@@ -81,7 +81,7 @@ const RegisterScreen = () => {
       // Prepare user data for Firestore
       const userData = {
         email,
-        fullName,
+        displayName,
         birthDate,
         contact,
         createdAt: new Date(),
@@ -125,8 +125,8 @@ const RegisterScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Nome Completo"
-          value={fullName}
-          onChangeText={(text) => setFullName(text)}
+          value={displayName}
+          onChangeText={(text) => setDisplayName(text)}
         />
 
         {/* Data de nascimento Input */}

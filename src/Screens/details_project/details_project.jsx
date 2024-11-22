@@ -93,8 +93,8 @@ const DetailsProjectScreen = () => {
     navigation.navigate("ListProject");
   };
 
-  const handleChat = () => {
-    navigation.navigate("Chat", { project });
+  const handleComment = () => {
+    navigation.navigate("CommentProject", { project });
   };
 
   if (isLoading) {
@@ -246,7 +246,7 @@ const DetailsProjectScreen = () => {
               <Text style={styles.subHeader}>Informações do Usuário</Text>
               <View style={styles.userInfoContainer}>
                 <Text style={styles.sectionTitle}>Nome: </Text>
-                <Text style={styles.userInfo}>{projectUser.fullName}</Text>
+                <Text style={styles.userInfo}>{projectUser.displayName}</Text>
               </View>
               <View style={styles.userInfoContainer}>
                 <Text style={styles.sectionTitle}>Email: </Text>
@@ -358,7 +358,7 @@ const DetailsProjectScreen = () => {
             {selectedStatus === "Faltando Informações" && (
               <TouchableOpacity
                 style={styles.statusButton}
-                onPress={handleChat}
+                onPress={handleComment}
               >
                 <Text style={styles.statusButtonText}>
                   Adicionar mais informações

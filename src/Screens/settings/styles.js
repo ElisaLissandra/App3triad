@@ -144,6 +144,11 @@ const styles = StyleSheet.create({
   logoutIcon: {
     marginLeft: 10, 
   },
+  loader: {
+    flex: 1,
+    justifyContent: "center", 
+    alignItems: "center",
+  },
 });
 
 export default styles;
