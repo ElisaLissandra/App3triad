@@ -20,6 +20,7 @@ import {
   Image,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
@@ -30,6 +31,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const CommentProjectScreen = () => {
   const { userData } = useContext(UserContext);
@@ -41,9 +43,9 @@ const CommentProjectScreen = () => {
   const db = getFirestore();
   const auth = getAuth();
   const user = auth.currentUser;
-  //const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  //const [selectedImage, setSelectedImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [downloadingItemId, setDownloadingItemId] = useState(null);
 
   // Função para enviar o comentário
   const handleAddComment = async () => {
@@ -65,10 +67,12 @@ const CommentProjectScreen = () => {
   };
 
   const sendImage = async () => {
+    setIsLoading(true);
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
       alert("É necessário permitir o acesso à galeria para enviar imagens.");
+      setIsLoading(false);
       return;
     }
 
@@ -84,7 +88,7 @@ const CommentProjectScreen = () => {
         let imageName =
           pickerResult.assets[0].imageName || `image-${Date.now()}`;
 
-        console.log("Nome da imagem:", imageName);
+        //console.log("Nome da imagem:", imageName);
 
         // Função para extrair a extensão da URL ou do nome do arquivo
         const getExtensionFromUri = (uri) => {
@@ -102,7 +106,7 @@ const CommentProjectScreen = () => {
           imageName = `${imageName}.${imageExtension}`;
         }
 
-        console.log("Nome final da imagem:", imageName);
+        //console.log("Nome final da imagem:", imageName);
 
         const response = await fetch(imageUri);
         const blob = await response.blob();
@@ -124,14 +128,19 @@ const CommentProjectScreen = () => {
         console.log("Imagem enviada com sucesso!");
       } catch (error) {
         console.error("Erro ao enviar imagem:", error);
+      } finally {
+        setIsLoading(false); // Desativa o carregamento após o envio
+        setIsPopupVisible(false); // Fecha o modal
       }
+    } else {
+      setIsLoading(false); // Desativa o carregamento se não houver seleção
+      setIsPopupVisible(false); // Fecha o modal se o usuário cancelar
     }
-
-    setIsPopupVisible(false); // Fecha o popup após o envio
   };
 
   // Função para enviar arquivo
   const sendFile = async () => {
+    setIsLoading(true);
     const pickerResult = await DocumentPicker.getDocumentAsync({ type: "*/*" });
 
     console.log("Resultado da seleção do arquivo:", pickerResult); // Verifique a estrutura completa
@@ -140,7 +149,7 @@ const CommentProjectScreen = () => {
     if (!pickerResult.canceled && pickerResult.assets?.length > 0) {
       const file = pickerResult.assets[0]; // Acessa o arquivo selecionado
 
-      console.log("Arquivo selecionado:", file); // Log para verificar o arquivo selecionado
+      //console.log("Arquivo selecionado:", file); // Log para verificar o arquivo selecionado
 
       try {
         const storage = getStorage();
@@ -168,12 +177,13 @@ const CommentProjectScreen = () => {
         console.log("Arquivo enviado com sucesso!");
       } catch (error) {
         console.error("Erro ao enviar o arquivo:", error);
+      } finally {
+        setIsLoading(false); // Desativa o carregamento após o envio
+        setIsPopupVisible(false); // Fecha o modal
       }
     } else {
-      console.log(
-        "Erro ao selecionar arquivo ou operação cancelada",
-        pickerResult
-      );
+      setIsLoading(false); // Desativa o carregamento se não houver seleção
+      setIsPopupVisible(false); // Fecha o modal se o usuário cancelar
     }
 
     setIsPopupVisible(false); // Fecha o popup após a seleção
@@ -210,7 +220,7 @@ const CommentProjectScreen = () => {
         const asset = await MediaLibrary.createAssetAsync(uri);
         await MediaLibrary.createAlbumAsync("Download", asset, false);
 
-        alert("Imagem salva na galeria com sucesso!");
+        //alert("Imagem salva na galeria com sucesso!");
       } else {
         alert("Permissão de acesso à galeria não concedida.");
       }
@@ -243,7 +253,7 @@ const CommentProjectScreen = () => {
         await MediaLibrary.createAlbumAsync("Download", asset, false);
       }
 
-      alert("Arquivo baixado com sucesso");
+      //alert("Arquivo baixado com sucesso");
     } catch (error) {
       console.error("Erro ao fazer o download do arquivo:", error);
       alert("Erro ao tentar baixar o arquivo.");
@@ -251,36 +261,55 @@ const CommentProjectScreen = () => {
   };
 
   const openImageModal = (imageUri, imageName) => {
-    // Exibe o alerta perguntando se o usuário deseja fazer o download
-    Alert.alert("Deseja baixar a imagem?", "", [
-      {
-        text: "Cancelar",
-        onPress: () => console.log("Download cancelado"),
-        style: "cancel",
-      },
-      {
-        text: "Sim",
-        onPress: () => downloadImage(imageUri, imageName),
-      },
-    ]);
+   downloadImage(imageUri, imageName)
   };
 
   const openFileModal = (fileUri, fileName) => {
     // Exibe o alerta perguntando se o usuário deseja fazer o download
-    Alert.alert("Deseja baixar o arquivo?", "", [
-      {
-        text: "Cancelar",
-        onPress: () => console.log("Download cancelado"),
-        style: "cancel",
-      },
-      {
-        text: "Sim",
-        onPress: () => downloadFile(fileUri, fileName),
-      },
-    ]);
+     downloadFile(fileUri, fileName)
   };
 
-  // Função para renderizar os itens do comentário
+   // Função personalizada para exibir o Alert e aguardar a confirmação
+const showConfirmationAlert = (type) =>
+  new Promise((resolve) => {
+    Alert.alert(
+      "Confirmação",
+      `Deseja baixar este ${type === "image" ? "Imagem" : "Arquivo"}?`,
+      [
+        { text: "Cancelar", onPress: () => resolve(false), style: "cancel" },
+        { text: "Confirmar", onPress: () => resolve(true) },
+      ]
+    );
+  });
+
+  const handleDownload = async (url, type, name, itemId) => {
+    // Aguarde a confirmação do usuário
+    const confirmed = await showConfirmationAlert(type);
+    if (!confirmed) return; // Sai se o usuário cancelar
+
+    setDownloadingItemId(itemId); // Mostra o loader após a confirmação
+    try {
+      // Simula o processo de download (substituir com a lógica real)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Lógica para abrir a imagem ou arquivo após o download
+      if (type === "image") {
+        openImageModal(url, name);
+      } else {
+        openFileModal(url, name);
+      }
+
+      Alert.alert(
+        "Sucesso",
+        `${type === "image" ? "Imagem" : "Arquivo"} baixado com sucesso!`
+      ); 
+    } catch (error) {
+      Alert.alert("Erro", "Houve um problema ao baixar o arquivo.");
+    } finally {
+      setDownloadingItemId(null); // Restaura o estado após o download
+    }
+  };
+
   const renderItem = ({ item }) => {
     const isCurrentUser = item.user === userData?.displayName;
 
@@ -296,17 +325,24 @@ const CommentProjectScreen = () => {
             ]}
           >
             <Text style={styles.userName}>
-              {item.user || "Usuário Desconhecido"}{" "}
+              {item.user || "Usuário Desconhecido"}
             </Text>
             <TouchableOpacity
-              onPress={() => openImageModal(item.image, item.imageName)}
+              onPress={() =>
+                handleDownload(item.image, "image", item.imageName, item.id)
+              }
+              disabled={downloadingItemId === item.id}
             >
-              <Image
-                key={item.id}
-                source={{ uri: item.image }}
-                style={styles.messageImage}
-                resizeMode="cover"
-              />
+              {downloadingItemId === item.id ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <Image
+                  key={item.id}
+                  source={{ uri: item.image }}
+                  style={styles.messageImage}
+                  resizeMode="cover"
+                />
+              )}
             </TouchableOpacity>
           </View>
         ) : item.file ? (
@@ -319,14 +355,21 @@ const CommentProjectScreen = () => {
             ]}
           >
             <Text style={styles.userName}>
-              {item.user || "Usuário Desconhecido"}{" "}
+              {item.user || "Usuário Desconhecido"}
             </Text>
             <TouchableOpacity
-              onPress={() => openFileModal(item.file, item.fileName)}
+              onPress={() =>
+                handleDownload(item.file, "file", item.fileName, item.id)
+              }
+              disabled={downloadingItemId === item.id}
             >
-              <Text style={styles.messageText}>
-                📄 {item.fileName || "Arquivo"}
-              </Text>
+              {downloadingItemId === item.id ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <Text style={styles.messageText}>
+                  📄 {item.fileName || "Arquivo"}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         ) : (
@@ -350,11 +393,116 @@ const CommentProjectScreen = () => {
     );
   };
 
-  // Função para fechar o modal da imagem
-  const closeImageModal = () => {
-    setIsImageModalVisible(false);
-    setSelectedImage(null);
-  };
+  
+
+  // Função para renderizar os itens do comentário
+  /* const renderItem = ({ item }) => {
+    const [downloadingItemId, setDownloadingItemId] = useState(null); // Estado para rastrear o item em download
+    const isCurrentUser = item.user === userData?.displayName;
+
+    const handleDownload = async (url, type, name, itemId) => {
+      setDownloadingItemId(itemId); // Define o item atual como sendo baixado
+      try {
+        // Simula o processo de download (substituir com a lógica real)
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Lógica para abrir a imagem ou arquivo após o download
+        if (type === "image") {
+          openImageModal(url, name);
+        } else {
+          openFileModal(url, name);
+        }
+
+        Alert.alert(
+          "Sucesso",
+          `${type === "image" ? "Imagem" : "Arquivo"} baixado com sucesso!`
+        );
+      } catch (error) {
+        Alert.alert("Erro", "Houve um problema ao baixar o arquivo.");
+      } finally {
+        setDownloadingItemId(null); // Restaura o estado após o download
+      }
+    };
+
+    return (
+      <View style={{ marginBottom: 10 }}>
+        {item.image ? (
+          <View
+            style={[
+              styles.messageContainer,
+              isCurrentUser
+                ? styles.messageCurrentUser
+                : styles.messageOtherUser,
+            ]}
+          >
+            <Text style={styles.userName}>
+              {item.user || "Usuário Desconhecido"}
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                handleDownload(item.image, "image", item.imageName, item.id)
+              }
+              disabled={downloadingItemId === item.id} // Desabilita o botão durante o download
+            >
+              {downloadingItemId === item.id ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <Image
+                  key={item.id}
+                  source={{ uri: item.image }}
+                  style={styles.messageImage}
+                  resizeMode="cover"
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        ) : item.file ? (
+          <View
+            style={[
+              styles.messageContainer,
+              isCurrentUser
+                ? styles.messageCurrentUser
+                : styles.messageOtherUser,
+            ]}
+          >
+            <Text style={styles.userName}>
+              {item.user || "Usuário Desconhecido"}
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                handleDownload(item.file, "file", item.fileName, item.id)
+              }
+              disabled={downloadingItemId === item.id} // Desabilita o botão durante o download
+            >
+              {downloadingItemId === item.id ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <Text style={styles.messageText}>
+                  📄 {item.fileName || "Arquivo"}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.messageContainer,
+              isCurrentUser
+                ? styles.messageCurrentUser
+                : styles.messageOtherUser,
+            ]}
+          >
+            <Text style={styles.userName}>
+              {item.user || "Usuário Desconhecido"}
+            </Text>
+            <Text style={styles.message}>
+              {item.message || "Mensagem vazia"}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  }; */
 
   // Verificar acesso do usuário
   if (!userData.isAdmin && !user) {
@@ -402,6 +550,7 @@ const CommentProjectScreen = () => {
         </TouchableOpacity>
       </View>
       {/* Modal para popup de seleção de imagem ou arquivo */}
+
       <Modal
         transparent={true}
         visible={isPopupVisible}
@@ -409,16 +558,33 @@ const CommentProjectScreen = () => {
         onRequestClose={() => setIsPopupVisible(false)}
       >
         <View style={styles.popupContainer}>
-          <View style={styles.popup}>
-            <TouchableOpacity onPress={sendImage} style={styles.popupOption}>
-              <Ionicons name="image" size={30} color="#0097B2" />
-              <Text>Imagem</Text>
+          {/* Exibir o botão de fechar apenas quando não estiver carregando */}
+          {!isLoading && (
+            <TouchableOpacity
+              onPress={() => setIsPopupVisible(false)}
+              style={styles.closeButton}
+            >
+              <FontAwesome5 name="times" size={24} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={sendFile} style={styles.popupOption}>
-              <Ionicons name="document" size={30} color="#0097B2" />
-              <Text>Arquivo</Text>
-            </TouchableOpacity>
-          </View>
+          )}
+
+          {/* Exibir o loading ou as opções, dependendo do estado de isLoading */}
+          {isLoading ? (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size={50} color="#fff" />
+            </View>
+          ) : (
+            <View style={styles.popup}>
+              <TouchableOpacity onPress={sendImage} style={styles.popupOption}>
+                <Ionicons name="image" size={30} color="#0097B2" />
+                <Text>Imagem</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={sendFile} style={styles.popupOption}>
+                <Ionicons name="document" size={30} color="#0097B2" />
+                <Text>Arquivo</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </Modal>
     </KeyboardAvoidingView>
