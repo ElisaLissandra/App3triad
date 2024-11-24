@@ -52,8 +52,13 @@ const SettingsScreen = () => {
     return () => unsubscribe(); // Limpa o listener ao desmontar
   }, []);
 
-  const handleLogout = () => {
-    navigation.navigate("Login");
+  const handleLogout = async () => {
+    try {
+      await auth.signOut(); // Desloga o usuário do Firebase
+      navigation.navigate("Login"); // Navega para a tela de login
+    } catch (error) {
+      console.log("Erro ao fazer logout:", error);
+    }
   };
 
   const handleListProject = () => {

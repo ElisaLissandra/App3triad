@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { View } from 'react-native';
 
 export const UserContext = createContext();
 /*
@@ -41,25 +40,27 @@ export const UserProvider = ({ children }) => {
   const db = getFirestore();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const user = auth.currentUser;
-
-        if (user) {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
           const userDocRef = doc(db, 'users', user.uid);
           const docSnap = await getDoc(userDocRef);
 
           if (docSnap.exists()) {
             setUserData(docSnap.data());
           }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+      } else {
+        // Limpa o userData se não houver usuário logado
+        setUserData(null);
       }
-    };
+    });
 
-    fetchUserData();
-  }, []);
+    // Cleanup function para parar de observar a mudança de autenticação
+    return () => unsubscribe();
+  }, [auth, db]);
 
   // Fallback para verificar o tipo de children
   if (!React.isValidElement(children)) {

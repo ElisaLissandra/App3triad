@@ -343,7 +343,7 @@ const CommentProjectScreen = () => {
               disabled={downloadingItemId === item.id}
             >
               {downloadingItemId === item.id ? (
-                <ActivityIndicator size="small" color="#0000ff" />
+                <ActivityIndicator size="small" color="#0097B2" />
               ) : (
                 <Image
                   key={item.id}
@@ -373,7 +373,7 @@ const CommentProjectScreen = () => {
               disabled={downloadingItemId === item.id}
             >
               {downloadingItemId === item.id ? (
-                <ActivityIndicator size="small" color="#0000ff" />
+                <ActivityIndicator size="small" color="#0097B2" />
               ) : (
                 <Text style={styles.messageText}>
                   📄 {item.fileName || "Arquivo"}
