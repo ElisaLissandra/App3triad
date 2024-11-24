@@ -190,7 +190,6 @@ const ProjectScreen = () => {
       console.error("Nenhum usuário está conectado no momento.");
     }
   });
-  
 
   return (
     <View style={styles.container}>
@@ -268,6 +267,9 @@ const ProjectScreen = () => {
                       >
                         {project.title}
                       </Text>
+                      {project.hasNewMessages && (
+                        <FontAwesome5 name="envelope" size={20} color="red" />
+                      )}
                       <Text style={styles.projectDate}>{project.deadline}</Text>
 
                       <View style={styles.detailsUrgentContainer}>

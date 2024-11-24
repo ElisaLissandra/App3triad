@@ -32,6 +32,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const CommentProjectScreen = () => {
   const { userData } = useContext(UserContext);
@@ -46,6 +47,11 @@ const CommentProjectScreen = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [downloadingItemId, setDownloadingItemId] = useState(null);
+  const navigation = useNavigation();
+
+  const handleListProject = () => {
+    navigation.navigate("ListProject");
+  };
 
   // Função para enviar o comentário
   const handleAddComment = async () => {
@@ -261,26 +267,26 @@ const CommentProjectScreen = () => {
   };
 
   const openImageModal = (imageUri, imageName) => {
-   downloadImage(imageUri, imageName)
+    downloadImage(imageUri, imageName);
   };
 
   const openFileModal = (fileUri, fileName) => {
     // Exibe o alerta perguntando se o usuário deseja fazer o download
-     downloadFile(fileUri, fileName)
+    downloadFile(fileUri, fileName);
   };
 
-   // Função personalizada para exibir o Alert e aguardar a confirmação
-const showConfirmationAlert = (type) =>
-  new Promise((resolve) => {
-    Alert.alert(
-      "Confirmação",
-      `Deseja baixar este ${type === "image" ? "Imagem" : "Arquivo"}?`,
-      [
-        { text: "Cancelar", onPress: () => resolve(false), style: "cancel" },
-        { text: "Confirmar", onPress: () => resolve(true) },
-      ]
-    );
-  });
+  // Função personalizada para exibir o Alert e aguardar a confirmação
+  const showConfirmationAlert = (type) =>
+    new Promise((resolve) => {
+      Alert.alert(
+        "Download",
+        `Deseja baixar ${type === "image" ? "esta imagem" : " este arquivo"}?`,
+        [
+          { text: "Cancelar", onPress: () => resolve(false), style: "cancel" },
+          { text: "Confirmar", onPress: () => resolve(true) },
+        ]
+      );
+    });
 
   const handleDownload = async (url, type, name, itemId) => {
     // Aguarde a confirmação do usuário
@@ -301,8 +307,10 @@ const showConfirmationAlert = (type) =>
 
       Alert.alert(
         "Sucesso",
-        `${type === "image" ? "Imagem" : "Arquivo"} baixado com sucesso!`
-      ); 
+        `${
+          type === "image" ? "Imagem baixada" : "Arquivo baixado"
+        } com sucesso!`
+      );
     } catch (error) {
       Alert.alert("Erro", "Houve um problema ao baixar o arquivo.");
     } finally {
@@ -310,6 +318,7 @@ const showConfirmationAlert = (type) =>
     }
   };
 
+  // Função para renderizar os itens do comentário
   const renderItem = ({ item }) => {
     const isCurrentUser = item.user === userData?.displayName;
 
@@ -393,117 +402,6 @@ const showConfirmationAlert = (type) =>
     );
   };
 
-  
-
-  // Função para renderizar os itens do comentário
-  /* const renderItem = ({ item }) => {
-    const [downloadingItemId, setDownloadingItemId] = useState(null); // Estado para rastrear o item em download
-    const isCurrentUser = item.user === userData?.displayName;
-
-    const handleDownload = async (url, type, name, itemId) => {
-      setDownloadingItemId(itemId); // Define o item atual como sendo baixado
-      try {
-        // Simula o processo de download (substituir com a lógica real)
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Lógica para abrir a imagem ou arquivo após o download
-        if (type === "image") {
-          openImageModal(url, name);
-        } else {
-          openFileModal(url, name);
-        }
-
-        Alert.alert(
-          "Sucesso",
-          `${type === "image" ? "Imagem" : "Arquivo"} baixado com sucesso!`
-        );
-      } catch (error) {
-        Alert.alert("Erro", "Houve um problema ao baixar o arquivo.");
-      } finally {
-        setDownloadingItemId(null); // Restaura o estado após o download
-      }
-    };
-
-    return (
-      <View style={{ marginBottom: 10 }}>
-        {item.image ? (
-          <View
-            style={[
-              styles.messageContainer,
-              isCurrentUser
-                ? styles.messageCurrentUser
-                : styles.messageOtherUser,
-            ]}
-          >
-            <Text style={styles.userName}>
-              {item.user || "Usuário Desconhecido"}
-            </Text>
-            <TouchableOpacity
-              onPress={() =>
-                handleDownload(item.image, "image", item.imageName, item.id)
-              }
-              disabled={downloadingItemId === item.id} // Desabilita o botão durante o download
-            >
-              {downloadingItemId === item.id ? (
-                <ActivityIndicator size="small" color="#0000ff" />
-              ) : (
-                <Image
-                  key={item.id}
-                  source={{ uri: item.image }}
-                  style={styles.messageImage}
-                  resizeMode="cover"
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-        ) : item.file ? (
-          <View
-            style={[
-              styles.messageContainer,
-              isCurrentUser
-                ? styles.messageCurrentUser
-                : styles.messageOtherUser,
-            ]}
-          >
-            <Text style={styles.userName}>
-              {item.user || "Usuário Desconhecido"}
-            </Text>
-            <TouchableOpacity
-              onPress={() =>
-                handleDownload(item.file, "file", item.fileName, item.id)
-              }
-              disabled={downloadingItemId === item.id} // Desabilita o botão durante o download
-            >
-              {downloadingItemId === item.id ? (
-                <ActivityIndicator size="small" color="#0000ff" />
-              ) : (
-                <Text style={styles.messageText}>
-                  📄 {item.fileName || "Arquivo"}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View
-            style={[
-              styles.messageContainer,
-              isCurrentUser
-                ? styles.messageCurrentUser
-                : styles.messageOtherUser,
-            ]}
-          >
-            <Text style={styles.userName}>
-              {item.user || "Usuário Desconhecido"}
-            </Text>
-            <Text style={styles.message}>
-              {item.message || "Mensagem vazia"}
-            </Text>
-          </View>
-        )}
-      </View>
-    );
-  }; */
-
   // Verificar acesso do usuário
   if (!userData.isAdmin && !user) {
     return (
@@ -520,8 +418,11 @@ const showConfirmationAlert = (type) =>
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Novas Informações</Text>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={handleListProject}>
+          <FontAwesome5 name="chevron-left" size={24} color="#0097B2" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Novas informações</Text>
       </View>
 
       <FlatList

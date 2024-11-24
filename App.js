@@ -32,7 +32,7 @@ export default function App() {
   }
 
   return (
-    <UserProvider> {/* Envolvendo o app com o UserProvider */}
+    <UserProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName={user ? "ListProject" : "Welcome"}>
           <Stack.Screen

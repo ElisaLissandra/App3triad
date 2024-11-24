@@ -15,6 +15,8 @@ import com.facebook.soloader.SoLoader
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
 
+import co.apptailor.googlesignin.RNGoogleSigninPackage;
+
 class MainApplication : Application(), ReactApplication {
 
   override val reactNativeHost: ReactNativeHost = ReactNativeHostWrapper(
@@ -23,6 +25,9 @@ class MainApplication : Application(), ReactApplication {
           override fun getPackages(): List<ReactPackage> {
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
+            val packages = PackageList(this).packages
+            // Adicione pacotes que não são autolinkados aqui
+            packages.add(RNGoogleSigninPackage()) 
             return PackageList(this).packages
           }
 

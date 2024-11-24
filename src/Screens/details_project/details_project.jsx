@@ -20,6 +20,7 @@ import styles from "./styles";
 import * as MediaLibrary from "expo-media-library";
 import { Picker } from "@react-native-picker/picker";
 
+
 const DetailsProjectScreen = () => {
   const route = useRoute();
   const { project } = route.params;

@@ -5,14 +5,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  header: {
-    marginTop: 40,
+  headerContainer: {
+    marginTop: 45,
     padding: 15,
     alignItems: "center",
+    flexDirection: "row",
   },
-  headerTitle: {
+  title: {
     fontSize: 20,
     fontWeight: "bold",
+    flex: 1,
+    textAlign: "center",
   },
   inputContainer: {
     flexDirection: "row",
