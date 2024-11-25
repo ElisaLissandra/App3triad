@@ -8,6 +8,7 @@ import RequestProject from "./src/Screens/request_project/request_project";
 import ListProject from "./src/Screens/list_project/list_project";
 import DetailsProject from "./src/Screens/details_project/details_project";
 import CommentProject from "./src/Screens/comment_project/comment_project";
+import ResetPassword from "./src/Screens/Auth/resetPassword/resetPassword"
 import Settings from "./src/Screens/settings/settings";
 import { auth } from "./firebase-config";
 import { UserProvider } from "./src/Context/UserContext"; // Importe o UserProvider
@@ -46,6 +47,11 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="ResetPassword"
+            component={ResetPassword}
+            options={{ title: "Redefinir Senha" }}
+          />
+          <Stack.Screen
             name="Register"
             component={Register}
             options={{ headerShown: false }}
@@ -60,22 +66,22 @@ export default function App() {
               <Stack.Screen
                 name="RequestProject"
                 component={RequestProject}
-                options={{ headerShown: false }}
+               options={{ title: "Explique sobre seu projeto" }}
               />
               <Stack.Screen
                 name="DetailsProject"
                 component={DetailsProject}
-                options={{ headerShown: false }}
+                options={{ title: "Detalhes do projeto" }}
               />
               <Stack.Screen
                 name="Settings"
                 component={Settings}
-                options={{ headerShown: false }}
+                options={{ title: "Configurações" }}
               />
               <Stack.Screen
                 name="CommentProject"
                 component={CommentProject}
-                options={{ headerShown: false }}
+               options={{ title: "Novas informações" }}
               />
             </Stack.Group>
           )}

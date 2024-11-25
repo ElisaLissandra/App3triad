@@ -49,8 +49,6 @@ const CommentProjectScreen = () => {
   const [downloadingItemId, setDownloadingItemId] = useState(null);
   const navigation = useNavigation();
 
-
-
   const handleListProject = () => {
     navigation.navigate("ListProject");
   };
@@ -196,7 +194,7 @@ const CommentProjectScreen = () => {
 
     setIsPopupVisible(false); // Fecha o popup após a seleção
   };
-  
+
   useEffect(() => {
     if (!project?.id) return;
 
@@ -213,7 +211,7 @@ const CommentProjectScreen = () => {
     });
 
     return () => unsubscribe(); // Limpa o listener ao desmontar o componente
-  }, [projectId]); 
+  }, [projectId]);
 
   // Função para fazer o download e salvar a imagem na galeria
   const downloadImage = async (imageUri, imageName) => {
@@ -420,12 +418,6 @@ const CommentProjectScreen = () => {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={handleListProject}>
-          <FontAwesome5 name="chevron-left" size={24} color="#0097B2" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Novas informações</Text>
-      </View>
 
       <FlatList
         data={comment}

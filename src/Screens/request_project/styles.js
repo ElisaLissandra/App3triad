@@ -16,18 +16,6 @@ const styles = StyleSheet.create({
     padding: 20, 
     justifyContent: 'flex-start',
   },
-  headerContainer: {
-    marginTop: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 30, 
-  },
-  title: {
-    fontSize: 18, 
-    fontWeight: 'bold',
-    marginLeft: 70,
-  },
-
   label: {
     fontSize: 14,
     marginBottom: 5,
@@ -97,7 +85,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0097B2",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 25,
+    borderRadius: 8,
   },
   submitButtonText: {
     color: "#fff",

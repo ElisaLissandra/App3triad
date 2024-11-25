@@ -235,12 +235,6 @@ const DetailsProjectScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={handleListProject}>
-              <FontAwesome5 name="chevron-left" size={24} color="#0097B2" />
-            </TouchableOpacity>
-            <Text style={styles.title}>Detalhes do projeto</Text>
-          </View>
           {/* Informações do Usuário */}
           {isAdmin && projectUser && (
             <>

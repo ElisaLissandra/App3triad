@@ -10,19 +10,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: "space-between",
   },
-  headerContainer: {
-    marginTop: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-  },
   titleProject: {
     fontSize: 16,
     color: "#8c8c8c",
@@ -122,11 +109,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   }, */
   statusButtonContainer: {
-    position: 'absolute',
+   /*  position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    paddingBottom: 20, // Espaço adicional se necessário
+    paddingBottom: 20, */
+    marginTop: "auto",
+    paddingBottom: 20,
   },
   statusButton: {
     backgroundColor: "#0097B2",

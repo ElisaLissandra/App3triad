@@ -10,19 +10,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: "flex-start",
   },
-  headerContainer: {
-    marginTop: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-  },
   titleProject: {
     fontSize: 16,
     color: "#8c8c8c",

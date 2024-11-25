@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0097B2",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 25,
+    borderRadius: 8,
     marginTop: 10,
   },
   registerButtonText: {

@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0097B2", 
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 30,
+    borderRadius: 8,
     marginBottom: 15,
     marginTop: 40,
   },
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ED1515',
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 30,
+    borderRadius: 8,
     padding: 10,
   },
   googleIcon: {

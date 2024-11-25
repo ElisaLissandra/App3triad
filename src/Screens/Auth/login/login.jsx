@@ -155,7 +155,7 @@ const LoginScreen = () => {
             {errorMessage ? (
               <Text style={styles.errorText}>{errorMessage}</Text>
             ) : null}
-            <Text style={styles.link}>Esqueceu a senha?</Text>
+            <Text style={styles.link} onPress={() => navigation.navigate("ResetPassword")}>Esqueceu a senha?</Text>
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
