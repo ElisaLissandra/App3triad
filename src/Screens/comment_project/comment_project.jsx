@@ -49,6 +49,8 @@ const CommentProjectScreen = () => {
   const [downloadingItemId, setDownloadingItemId] = useState(null);
   const navigation = useNavigation();
 
+
+
   const handleListProject = () => {
     navigation.navigate("ListProject");
   };
@@ -194,7 +196,7 @@ const CommentProjectScreen = () => {
 
     setIsPopupVisible(false); // Fecha o popup após a seleção
   };
-
+  
   useEffect(() => {
     if (!project?.id) return;
 
@@ -211,7 +213,7 @@ const CommentProjectScreen = () => {
     });
 
     return () => unsubscribe(); // Limpa o listener ao desmontar o componente
-  }, [projectId]);
+  }, [projectId]); 
 
   // Função para fazer o download e salvar a imagem na galeria
   const downloadImage = async (imageUri, imageName) => {

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -15,13 +15,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 30,
-    justifyContent: "center", 
+    justifyContent: "center",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    flex: 1, 
-    textAlign: "center", 
+    flex: 1,
+    textAlign: "center",
   },
   titleProject: {
     fontSize: 16,
@@ -30,13 +30,13 @@ const styles = StyleSheet.create({
   },
   userInfoContainer: {
     flexDirection: "row",
-    alignItems: "center", 
+    alignItems: "center",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold", 
-    marginBottom: 0, 
-    color: "#333", 
+    fontWeight: "bold",
+    marginBottom: 0,
+    color: "#333",
     lineHeight: 22,
   },
   userInfo: {
@@ -45,13 +45,60 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginTop: 15,
   },
+  userInfoInput: {
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    paddingVertical: 5,
+    flex: 1,
+    fontSize: 16,
+    color: "#333",
+  },
+  editButton: {
+    backgroundColor: "#ffa300",
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  editText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  saveButton: {
+    backgroundColor: "#28a745",
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    flex: 1, // Opcional: ajusta o botão para ocupar uma parte do espaço disponível
+  },
+  saveText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  cancelButton: {
+    backgroundColor: "#FF6347", // Cor do fundo do botão (tom de vermelho)
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10, // Espaço entre os botões "Salvar" e "Cancelar"
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1, // Opcional: ajusta o botão para ocupar uma parte do espaço disponível
+  },
+  cancelText: {
+    color: "#fff", // Cor do texto do botão
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   subHeader: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#3c3c3c",
     paddingVertical: 8,
     marginTop: 10,
-    marginBottom: 5,
+    marginBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     backgroundColor: "#f9f9f9",
@@ -65,7 +112,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#F0F0F0",
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: 50,
   },
   fileInfo: {
     flexDirection: "column",
@@ -127,27 +174,26 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   logoutButton: {
-    marginTop: 390,
-    backgroundColor: '#ff4d4d',
+    backgroundColor: "#ff4d4d",
     paddingVertical: 12,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
     borderRadius: 8,
   },
   logoutText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10, 
-  },
-  logoutIcon: {
-    marginLeft: 10, 
+    fontWeight: "bold",
   },
   loader: {
     flex: 1,
-    justifyContent: "center", 
+    justifyContent: "center",
     alignItems: "center",
+  },
+  buttonsContainer: {
+    marginTop: "auto",
+    paddingBottom: 20,
   },
 });
 
