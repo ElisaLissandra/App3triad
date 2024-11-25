@@ -12,11 +12,11 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../../../../firebase-config";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { FontAwesome5 } from '@expo/vector-icons';
-import { TextInputMask } from 'react-native-masked-text'; // Importar a biblioteca de máscara
+import { FontAwesome5 } from "@expo/vector-icons";
+import { TextInputMask } from "react-native-masked-text"; // Importar a biblioteca de máscara
 import styles from "./styles";
 
 const RegisterScreen = () => {
@@ -31,27 +31,6 @@ const RegisterScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-
-  // Listen for keyboard show/hide events
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-      setIsKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
-      setIsKeyboardVisible(false);
-    });
-
-    // Cleanup listeners on unmount
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  const handleLogin = () => {
-    navigation.navigate("Login");
-  };
 
   const handleRegister = async () => {
     // Validações
@@ -85,17 +64,25 @@ const RegisterScreen = () => {
         birthDate,
         contact,
         createdAt: new Date(),
-        isAdmin: false, 
+        isAdmin: false,
       };
 
       // Save user data to Firestore
       await setDoc(doc(db, "users", userId), userData);
 
-      console.log("Usuário cadastrado com sucesso:", userCredential.user);
+      // Enviar e-mail de verificação
+      await sendEmailVerification(auth.currentUser);
+
+      Alert.alert(
+        "Cadastro realizado com sucesso!",
+        "Verifique seu e-mail para confirmar sua conta."
+      );
+
+      // Redirecionar para a tela de login
       navigation.navigate("Login");
     } catch (error) {
       console.error("Erro ao cadastrar usuário:", error);
-      Alert.alert(error.message);
+      Alert.alert("Erro", error.message);
     }
   };
 
@@ -132,9 +119,9 @@ const RegisterScreen = () => {
         {/* Data de nascimento Input */}
         <Text style={styles.label}>Data de nascimento</Text>
         <TextInputMask
-          type={'datetime'}
+          type={"datetime"}
           options={{
-            format: 'DD/MM/YYYY'
+            format: "DD/MM/YYYY",
           }}
           style={styles.input}
           placeholder="DD/MM/YYYY"
@@ -145,9 +132,9 @@ const RegisterScreen = () => {
         {/* Contato Input */}
         <Text style={styles.label}>Contato</Text>
         <TextInputMask
-          type={'custom'}
+          type={"custom"}
           options={{
-            mask: '(99) 99999-9999'
+            mask: "(99) 99999-9999",
           }}
           style={styles.input}
           placeholder="(00) 00000-0000"
@@ -165,8 +152,11 @@ const RegisterScreen = () => {
             value={password}
             onChangeText={(text) => setPassword(text)}
           />
-          <TouchableOpacity onPress={() => setShowPassword(prev => !prev)} style={styles.eyeIcon}>
-            <FontAwesome5 
+          <TouchableOpacity
+            onPress={() => setShowPassword((prev) => !prev)}
+            style={styles.eyeIcon}
+          >
+            <FontAwesome5
               name={showPassword ? "eye" : "eye-slash"}
               size={24}
               color="black"
@@ -184,8 +174,11 @@ const RegisterScreen = () => {
             value={confirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
           />
-          <TouchableOpacity onPress={() => setShowConfirmPassword(prev => !prev)} style={styles.eyeIcon}>
-            <FontAwesome5 
+          <TouchableOpacity
+            onPress={() => setShowConfirmPassword((prev) => !prev)}
+            style={styles.eyeIcon}
+          >
+            <FontAwesome5
               name={showConfirmPassword ? "eye" : "eye-slash"}
               size={24}
               color="black"
@@ -203,8 +196,8 @@ const RegisterScreen = () => {
 
         {/* Login Link */}
         <Text style={styles.loginText}>
-          Não tem uma conta?{" "}
-          <Text style={styles.loginLink} onPress={handleLogin}>
+          Já tem uma conta?{" "}
+          <Text style={styles.loginLink} onPress={() => navigation.navigate("Login")}>
             Login
           </Text>
         </Text>
