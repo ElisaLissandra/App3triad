@@ -8,10 +8,11 @@ import RequestProject from "./src/Screens/request_project/request_project";
 import ListProject from "./src/Screens/list_project/list_project";
 import DetailsProject from "./src/Screens/details_project/details_project";
 import CommentProject from "./src/Screens/comment_project/comment_project";
-import ResetPassword from "./src/Screens/Auth/resetPassword/resetPassword"
+import ResetPassword from "./src/Screens/Auth/resetPassword/resetPassword";
 import Settings from "./src/Screens/settings/settings";
 import { auth } from "./firebase-config";
 import { UserProvider } from "./src/Context/UserContext"; // Importe o UserProvider
+
 
 const Stack = createNativeStackNavigator();
 
@@ -66,7 +67,7 @@ export default function App() {
               <Stack.Screen
                 name="RequestProject"
                 component={RequestProject}
-               options={{ title: "Explique sobre seu projeto" }}
+                options={{ title: "Explique sobre seu projeto" }}
               />
               <Stack.Screen
                 name="DetailsProject"
@@ -81,7 +82,7 @@ export default function App() {
               <Stack.Screen
                 name="CommentProject"
                 component={CommentProject}
-               options={{ title: "Novas informações" }}
+                options={{ title: "Novas informações" }}
               />
             </Stack.Group>
           )}

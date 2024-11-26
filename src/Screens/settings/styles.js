@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
   editText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "bold",
   },
   saveButton: {
     backgroundColor: "#28a745",
@@ -63,21 +62,6 @@ const styles = StyleSheet.create({
   saveText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "bold",
-  },
-  cancelButton: {
-    backgroundColor: "#FF6347", // Cor do fundo do botão (tom de vermelho)
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 10, // Espaço entre os botões "Salvar" e "Cancelar"
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1, // Opcional: ajusta o botão para ocupar uma parte do espaço disponível
-  },
-  cancelText: {
-    color: "#fff", // Cor do texto do botão
-    fontSize: 16,
-    fontWeight: "bold",
   },
   subHeader: {
     fontSize: 18,
@@ -171,7 +155,6 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "bold",
   },
   loader: {
     flex: 1,

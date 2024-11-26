@@ -47,7 +47,10 @@ export const UserProvider = ({ children }) => {
           const docSnap = await getDoc(userDocRef);
 
           if (docSnap.exists()) {
-            setUserData(docSnap.data());
+            setUserData({
+              uid: user.uid, // Salva o uid do usuário
+              ...docSnap.data(), // Dados adicionais do usuário
+            });
           }
         } catch (error) {
           console.error("Error fetching user data:", error);

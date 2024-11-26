@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import * as Sharing from "expo-sharing";
 import styles from "./styles";
 import * as MediaLibrary from "expo-media-library";
 import { Picker } from "@react-native-picker/picker";
+import { UserContext } from "../../Context/UserContext";
 
 
 const DetailsProjectScreen = () => {
@@ -33,13 +34,13 @@ const DetailsProjectScreen = () => {
     status,
     files = [],
   } = project;
-  const [user, setUser] = useState(null);
   const [projectUser, setProjectUser] = useState(null);
   const navigation = useNavigation();
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [isLoading, setIsLoading] = useState(true);
   const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+  const { userData } = useContext(UserContext);
 
   const getUserById = async (userId) => {
     try {
@@ -60,40 +61,30 @@ const DetailsProjectScreen = () => {
 
   // Obter o usuário autenticado e verificar se é admin
   useEffect(() => {
-    const fetchAuthenticatedUser = async () => {
+    const fetchProjectUser = async () => {
       try {
-        //const auth = getAuth();
-        const authenticatedUser = auth.currentUser;
-
-        if (authenticatedUser) {
-          const userData = await getUserById(authenticatedUser.uid);
-          setUser(userData);
-          setIsAdmin(userData?.isAdmin || false);
-        }
-
-        // Verifica se o projeto tem um userId do solicitante
         if (project.userId) {
-          // Busca o usuário solicitante do projeto
           const projectUserData = await getUserById(project.userId);
           setProjectUser(projectUserData); // Define os dados do solicitante do projeto
         }
       } catch (error) {
-        console.error(
-          "Erro ao buscar informações do usuário autenticado:",
-          error
-        );
+        console.error("Erro ao buscar informações do usuário do projeto:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAuthenticatedUser();
-  }, []);
+    if (userData) {
+      setIsAdmin(userData?.isAdmin || false); // Define se o usuário autenticado é admin
+    }
 
-  const handleListProject = () => {
+    fetchProjectUser();
+  }, [project.userId, userData]);
+
+  /* const handleListProject = () => {
     navigation.navigate("ListProject");
   };
-
+ */
   const handleComment = () => {
     navigation.navigate("CommentProject", { project });
   };

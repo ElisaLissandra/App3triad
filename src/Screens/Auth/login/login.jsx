@@ -17,9 +17,10 @@ import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../../../../firebase-config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
+import { UserContext } from "../../../Context/UserContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -71,11 +72,11 @@ const LoginScreen = () => {
       .then((userCredential) => {
         const user = userCredential.user;
   
-        // Verificar se o email foi confirmado
+       /*  // Verificar se o email foi confirmado
         if (!user.emailVerified) {
           setErrorMessage("Por favor, verifique seu email antes de fazer login.");
           return;
-        }
+        } */
   
         // Caso o email esteja verificado, prosseguir
         checkIfUserIsAdmin(user.uid);

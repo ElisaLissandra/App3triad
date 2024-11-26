@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,28 +11,31 @@ import {
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
+  getFirestore,
   collection,
   onSnapshot,
   query,
   where,
-  doc,
-  getDoc,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
-import { auth } from "../../../firebase-config";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import FilterModal from "./modal/modal_filter";
+import { UserContext } from "../../Context/UserContext";
+import { getAuth } from "firebase/auth";
 
 const ProjectScreen = () => {
+  const { userData } = useContext(UserContext);
+  console.log(userData);
+  /* const db = getFirestore();
+  const auth = getAuth();
+  const user = auth.currentUser; */
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [showUrgentOnly, setShowUrgentOnly] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const currentUser = auth.currentUser;
   const navigation = useNavigation();
   const [buttonPosition, setButtonPosition] = useState({ x: 30, y: 600 });
 
@@ -75,92 +78,57 @@ const ProjectScreen = () => {
     },
   ];
 
-  const fetchProjects = (currentUserId) => {
-    if (!currentUserId) {
-      console.error("currentUserId é indefinido");
+  // Função para buscar projetos
+  useEffect(() => {
+    if (!userData) {
+      // Exibe um estado de carregamento se o userData ainda não estiver disponível
+      console.log("Usuário não encontrado no contexto.");
+      setLoading(false);
       return;
     }
 
-    // Primeiro, busque o documento do usuário para verificar se ele é admin
-    const userDocRef = doc(db, "users", currentUserId); // Supondo que você tenha uma coleção "users"
+    const fetchProjects = () => {
+      const { isAdmin, uid } = userData;
 
-    getDoc(userDocRef)
-      .then((userDoc) => {
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          const isAdmin = userData.isAdmin || false; // Verifica se o usuário é admin
-          setIsAdmin(isAdmin);
-
-          let projectsQuery;
-
-          if (isAdmin) {
-            // Se for admin, busca todos os projetos
-            projectsQuery = collection(db, "projects");
-          } else {
-            // Se não for admin, busca apenas os projetos do usuário
-            projectsQuery = query(
-              collection(db, "projects"),
-              where("userId", "==", currentUserId)
-            );
-          }
-
-          const unsubscribe = onSnapshot(
-            projectsQuery,
-            (querySnapshot) => {
-              let projectsData = querySnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-
-              //console.log("Projetos do usuário:", projectsData);
-              setProjects(projectsData);
-              setLoading(false);
-            },
-            (error) => {
-              console.error("Erro ao escutar projetos:", error);
-              Alert.alert("Erro", "Não foi possível carregar os projetos.");
-              setLoading(false);
-            }
-          );
-
-          return unsubscribe;
-        } else {
-          console.error("Documento do usuário não encontrado.");
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar documento do usuário:", error);
-      });
-  };
-
-  useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged((user) => {
-      if (user) {
-        fetchProjects(user.uid);
-      } else {
-        console.error("Nenhum usuário está conectado no momento.");
+      if (!uid) {
+        console.error("UID do usuário não está definido.");
+        setLoading(false);
+        return;
       }
-    });
 
-    return () => unsubscribeFromAuth();
-  }, []);
+      const projectsQuery = isAdmin
+        ? collection(db, "projects")
+        : query(collection(db, "projects"), where("userId", "==", uid));
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchProjects(currentUser.uid); // Passa o ID do usuário atual
-    }
-  }, [currentUser]);
+      const unsubscribe = onSnapshot(
+        projectsQuery,
+        (querySnapshot) => {
+          const projectsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setProjects(projectsData);
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Erro ao carregar projetos:", error);
+          Alert.alert("Erro", "Não foi possível carregar os projetos.");
+          setLoading(false);
+        }
+      );
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (e, gestureState) => {
-      setButtonPosition({
-        x: gestureState.moveX - 30, // ajuste para centralizar o botão
-        y: gestureState.moveY - 30,
-      });
-    },
-    onPanResponderRelease: () => {},
-  });
+      return unsubscribe;
+    };
+
+    // Se userData estiver disponível, faça a busca
+    const unsubscribe = fetchProjects();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [userData]);
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearchText =
@@ -169,8 +137,6 @@ const ProjectScreen = () => {
       project.deadline.toLowerCase().includes(searchText.toLowerCase());
 
     const matchesUrgent = !showUrgentOnly || project.urgent;
-
-    // Verificar se o status do projeto está na lista de status selecionados
     const matchesStatus =
       selectedStatus.length === 0 || selectedStatus.includes(project.status);
 
@@ -183,12 +149,15 @@ const ProjectScreen = () => {
     setIsModalVisible(false);
   };
 
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      fetchProjects(user.uid);
-    } else {
-      console.error("Nenhum usuário está conectado no momento.");
-    }
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (e, gestureState) => {
+      setButtonPosition({
+        x: gestureState.moveX - 30,
+        y: gestureState.moveY - 30,
+      });
+    },
+    onPanResponderRelease: () => {},
   });
 
   return (
@@ -312,8 +281,7 @@ const ProjectScreen = () => {
         </ScrollView>
       </View>
 
-      {/* Botão flutuante para adicionar projetos com movimento */}
-      {!isAdmin && !loading && (
+      {!userData?.isAdmin && !loading && (
         <View
           {...panResponder.panHandlers}
           style={[

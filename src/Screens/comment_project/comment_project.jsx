@@ -32,7 +32,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const CommentProjectScreen = () => {
   const { userData } = useContext(UserContext);
@@ -47,11 +47,6 @@ const CommentProjectScreen = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [downloadingItemId, setDownloadingItemId] = useState(null);
-  const navigation = useNavigation();
-
-  const handleListProject = () => {
-    navigation.navigate("ListProject");
-  };
 
   // Função para enviar o comentário
   const handleAddComment = async () => {
@@ -414,16 +409,13 @@ const CommentProjectScreen = () => {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <FlatList
         data={comment}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
+        contentContainerStyle={{ flexGrow: 1 }} // Ensures FlatList takes full height
       />
 
       <View style={styles.inputContainer}>
@@ -444,8 +436,8 @@ const CommentProjectScreen = () => {
           <Ionicons name="send" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-      {/* Modal para popup de seleção de imagem ou arquivo */}
 
+      {/* Modal for image or file selection */}
       <Modal
         transparent={true}
         visible={isPopupVisible}
@@ -453,7 +445,6 @@ const CommentProjectScreen = () => {
         onRequestClose={() => setIsPopupVisible(false)}
       >
         <View style={styles.popupContainer}>
-          {/* Exibir o botão de fechar apenas quando não estiver carregando */}
           {!isLoading && (
             <TouchableOpacity
               onPress={() => setIsPopupVisible(false)}
@@ -463,7 +454,6 @@ const CommentProjectScreen = () => {
             </TouchableOpacity>
           )}
 
-          {/* Exibir o loading ou as opções, dependendo do estado de isLoading */}
           {isLoading ? (
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size={50} color="#fff" />

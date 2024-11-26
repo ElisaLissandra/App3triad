@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext} from "react";
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import styles from "./styles";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { TextInputMask } from "react-native-masked-text";
+import { UserContext } from "../../Context/UserContext";
 
 const RequestProject = () => {
   const [urgent, setUrgent] = useState(false);
@@ -32,6 +33,8 @@ const RequestProject = () => {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+
+  const { userData } = useContext(UserContext);
 
   // Verifica se todos os campos obrigatórios estão preenchidos
   const isFormComplete = title && description && generalContext && deadline;
@@ -103,10 +106,7 @@ const RequestProject = () => {
     setIsLoading(true);
 
     try {
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
-
-      if (!currentUser) {
+      if (!userData) {
         Alert.alert("Erro", "Nenhum usuário autenticado.");
         return;
       }
@@ -136,7 +136,7 @@ const RequestProject = () => {
         urgent,
         files: uploadedFileUrls, // Lista de URLs dos arquivos
         status: "Pendente",
-        userId: currentUser.uid,
+        userId: userData.uid,
       });
 
       Alert.alert("Sucesso", "Projeto enviado com sucesso!");
@@ -154,9 +154,6 @@ const RequestProject = () => {
     }
   };
 
-  const handleListProject = () => {
-    navigation.navigate("ListProject");
-  };
 
   return (
     <KeyboardAvoidingView
@@ -169,7 +166,6 @@ const RequestProject = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-
           {/* Project Title */}
           <Text style={styles.label}>Título do Projeto</Text>
           <TextInput
@@ -270,7 +266,7 @@ const RequestProject = () => {
           {/* <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Enviar</Text>
           </TouchableOpacity> */}
-           <TouchableOpacity
+          <TouchableOpacity
             style={[
               styles.submitButton,
               (isLoading || !isFormComplete) && { backgroundColor: "#d3d3d3" },
