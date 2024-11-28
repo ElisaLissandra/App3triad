@@ -49,6 +49,7 @@ const CommentProjectScreen = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [downloadingItemId, setDownloadingItemId] = useState(null);
+  
 
   // Função para enviar o comentário
   const handleAddComment = async () => {

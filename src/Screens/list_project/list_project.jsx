@@ -16,7 +16,6 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import styles from "./styles";
@@ -27,6 +26,7 @@ import { getAuth } from "firebase/auth";
 
 const ProjectScreen = () => {
   const { userData } = useContext(UserContext);
+  console.log(userData);
   /* const db = getFirestore();
   const auth = getAuth();
   const user = auth.currentUser; */
@@ -79,7 +79,7 @@ const ProjectScreen = () => {
   ];
 
   // Função para buscar projetos
-  /*   useEffect(() => {
+  useEffect(() => {
     if (!userData) {
       // Exibe um estado de carregamento se o userData ainda não estiver disponível
       console.log("Usuário não encontrado no contexto.");
@@ -128,79 +128,6 @@ const ProjectScreen = () => {
         unsubscribe();
       }
     };
-  }, [userData]);  */
-
-  useEffect(() => {
-    if (!userData) {
-      console.log("Usuário não encontrado no contexto.");
-      return;
-    }
-
-    const fetchProjects = async () => {
-      const { isAdmin, uid } = userData;
-
-      if (!uid) {
-        console.error("UID do usuário não está definido.");
-        return;
-      }
-
-      setLoading(true);
-
-      const projectsQuery = isAdmin
-        ? collection(db, "projects")
-        : query(collection(db, "projects"), where("userId", "==", uid));
-
-      try {
-        const querySnapshot = await getDocs(projectsQuery);
-        const projectsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        //console.log("Initial projects data:", projectsData);
-
-        const updatedProjects = await Promise.all(
-          projectsData.map(async (project) => {
-            console.log(
-              `Fetching comments for project ${project.title} with ID: ${project.id}`
-            );
-
-            // Ajuste para o nome correto da coleção e subcoleção
-            const commentsRef = collection(
-              db,
-              "projects",
-              project.id,
-              "comment"
-            );
-            try {
-              const commentsSnapshot = await getDocs(commentsRef);
-              const comments = commentsSnapshot.docs.map((commentDoc) => ({
-                id: commentDoc.id,
-                ...commentDoc.data(),
-              }));
-
-              console.log(`Comments for project ${project.title}:`, comments);
-              return { ...project, comments }; // Retorna os projetos com os comentários
-            } catch (error) {
-              console.error(
-                `Error fetching comments for project ${project.title}:`,
-                error
-              );
-              return { ...project, comments: [] }; // Retorna uma lista vazia se falhar
-            }
-          })
-        );
-
-        setProjects(updatedProjects);
-      } catch (error) {
-        console.error("Erro ao carregar projetos e comentários:", error);
-        Alert.alert("Erro", "Não foi possível carregar os projetos.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
   }, [userData]);
 
   const filteredProjects = projects.filter((project) => {
@@ -309,20 +236,9 @@ const ProjectScreen = () => {
                       >
                         {project.title}
                       </Text>
-                      {project.hasNewComments &&
-                        project.comments.some((comment) => {
-                          return (
-                            comment.userId && comment.userId !== userData.uid
-                          );
-                        }) && (
-                          <FontAwesome5
-                            name="comment-alt"
-                            size={16}
-                            color="#FF0000"
-                            style={styles.newCommentIcon}
-                          />
-                        )}
-
+                      {project.hasNewMessages && (
+                        <FontAwesome5 name="envelope" size={20} color="red" />
+                      )}
                       <Text style={styles.projectDate}>{project.deadline}</Text>
 
                       <View style={styles.detailsUrgentContainer}>

@@ -86,11 +86,11 @@ const LoginScreen = () => {
       .then((userCredential) => {
         const user = userCredential.user;
 
-        /*  // Verificar se o email foi confirmado
+         // Verificar se o email foi confirmado
         if (!user.emailVerified) {
           setErrorMessage("Por favor, verifique seu email antes de fazer login.");
           return;
-        } */
+        }
 
         // Caso o email esteja verificado, prosseguir
         checkIfUserIsAdmin(user.uid);
