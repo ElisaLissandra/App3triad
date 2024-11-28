@@ -7,6 +7,8 @@ import {
   orderBy,
   addDoc,
   serverTimestamp,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
@@ -58,6 +60,7 @@ const CommentProjectScreen = () => {
         await addDoc(collection(db, `projects/${projectId}/comment`), {
           message: newComment,
           user: userData?.displayName,
+          userId: userData?.uid,
           timestamp: serverTimestamp(),
         });
         setNewComment(""); // Limpa o campo de input após envio
@@ -123,6 +126,7 @@ const CommentProjectScreen = () => {
           image: imageUrl, // URL da imagem
           imageName: imageName, // Nome da imagem com a extensão
           user: userData?.displayName,
+          userId: userData?.uid,
           timestamp: serverTimestamp(),
         });
 
@@ -172,6 +176,7 @@ const CommentProjectScreen = () => {
           file: fileUrl, // URL do arquivo
           fileName: file.name, // Nome do arquivo
           user: userData?.displayName,
+          userId: userData?.uid,
           timestamp: serverTimestamp(),
         });
 
@@ -190,23 +195,157 @@ const CommentProjectScreen = () => {
     setIsPopupVisible(false); // Fecha o popup após a seleção
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!project?.id) return;
 
     const db = getFirestore();
     const commentRef = collection(db, `projects/${projectId}/comment`);
     const q = query(commentRef, orderBy("timestamp", "desc"));
-
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const commentData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setComment(commentData);
+  useEffect(() => {
+    if (!projectId) return;
+
+    const db = getFirestore();
+    const commentRef = collection(db, `projects/${projectId}/comment`);
+    const q = query(commentRef, orderBy("timestamp", "desc"));
+
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const commentData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const projectRef = doc(db, "projects", projectId);
+      const newComment = commentData[0]; // Comentário mais recente
+
+      if (newComment?.timestamp > lastCommentTimestamp) {
+        setLastCommentTimestamp(newComment.timestamp);
+
+        // Alerta o usuário e marca o comentário como visualizado
+        if (newComment.userId !== user?.uid && !newComment.visualizado) {
+          alert(
+            `Novo comentário de ${newComment.user}: "${newComment.message}"`
+          );
+
+          // Atualiza o comentário como visualizado
+          const commentDocRef = doc(
+            db,
+            `projects/${projectId}/comment`,
+            newComment.id
+          );
+          await updateDoc(commentDocRef, { visualizado: true });
+          console.log(`Comentário ${newComment.id} marcado como visualizado.`);
+        }
+      }
+
+      // Verifica se todos os comentários foram visualizados
+      const allCommentsViewed = commentData.every(
+        (comment) => comment.visualizado === true
+      );
+
+      if (allCommentsViewed && newComment?.userId !== user?.uid) {
+        // Altere hasNewComments para false se o usuário atual não for o autor do comentário
+        try {
+          await updateDoc(projectRef, { hasNewComments: false });
+          console.log("hasNewComments atualizado para false.");
+        } catch (error) {
+          console.error("Erro ao atualizar hasNewComments:", error);
+        }
+      } else if (!allCommentsViewed && newComment?.userId !== user?.uid) {
+        // Altere hasNewComments para true apenas para novos comentários não visualizados
+        try {
+          await updateDoc(projectRef, { hasNewComments: true });
+          console.log("hasNewComments atualizado para true.");
+        } catch (error) {
+          console.error("Erro ao atualizar hasNewComments:", error);
+        }
+      }
+
+      setComment(commentData); // Atualiza o estado dos comentários
     });
 
     return () => unsubscribe(); // Limpa o listener ao desmontar o componente
-  }, [projectId]);
+  }, [projectId, lastCommentTimestamp, user]); 
+    }); 
+
+    return () => unsubscribe(); // Limpa o listener ao desmontar o componente
+  }, [projectId]); */
+
+  const [lastCommentTimestamp, setLastCommentTimestamp] = useState(0);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    const db = getFirestore();
+    const commentRef = collection(db, `projects/${projectId}/comment`);
+    const q = query(commentRef, orderBy("timestamp", "desc"));
+
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const commentData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const projectRef = doc(db, "projects", projectId);
+      const newComment = commentData[0]; // Comentário mais recente
+
+      if (newComment?.timestamp > lastCommentTimestamp) {
+        setLastCommentTimestamp(newComment.timestamp);
+
+        if (newComment.userId !== user?.uid && !newComment.visualizado) {
+          alert(
+            `Novo comentário de ${newComment.user}: "${newComment.message}"`
+          );
+
+          // Atualiza o comentário como visualizado
+          const commentDocRef = doc(
+            db,
+            `projects/${projectId}/comment`,
+            newComment.id
+          );
+          await updateDoc(commentDocRef, { visualizado: true });
+          console.log(`Comentário ${newComment.id} marcado como visualizado.`);
+        }
+      }
+
+      // Verifica se todos os comentários foram visualizados
+      const allCommentsViewed = commentData.every((comment) => {
+        // Verifique se visualizado é verdadeiro e não nulo
+        const isViewed = comment.visualizado === true;
+        console.log(
+          `Comentário ${comment.id}: visualizado = ${comment.visualizado}, isViewed = ${isViewed}`,
+        );
+        return isViewed;
+      });
+
+      // Se todos os comentários foram visualizados, altera hasNewComments para false
+      if (allCommentsViewed) {
+        try {
+          await updateDoc(projectRef, { hasNewComments: false });
+          console.log("hasNewComments atualizado para false.");
+        } catch (error) {
+          console.error("Erro ao atualizar hasNewComments:", error);
+        }
+      } else {
+        try {
+          await updateDoc(projectRef, { hasNewComments: true });
+          console.log("hasNewComments atualizado para true.");
+        } catch (error) {
+          console.error("Erro ao atualizar hasNewComments:", error);
+        }
+      }
+
+      setComment(commentData); // Atualiza o estado dos comentários
+    });
+
+    return () => unsubscribe(); // Limpa o listener ao desmontar o componente
+  }, [projectId, lastCommentTimestamp, user]); 
 
   // Função para fazer o download e salvar a imagem na galeria
   const downloadImage = async (imageUri, imageName) => {
@@ -371,7 +510,8 @@ const CommentProjectScreen = () => {
                 <ActivityIndicator size="small" color="#0097B2" />
               ) : (
                 <Text style={styles.messageText}>
-                  📄 {item.fileName || "Arquivo"}
+                  <FontAwesome5 name="file-alt" size={22} color="#fff" solid />{" "}
+                  {item.fileName || "Arquivo"}
                 </Text>
               )}
             </TouchableOpacity>
@@ -423,7 +563,7 @@ const CommentProjectScreen = () => {
           onPress={() => setIsPopupVisible(true)}
           style={styles.attachButton}
         >
-          <Ionicons name="attach" size={24} color="#0097B2" />
+          <FontAwesome5 name="paperclip" size={22} color="#0097B2" />
         </TouchableOpacity>
 
         <TextInput
@@ -433,7 +573,7 @@ const CommentProjectScreen = () => {
           onChangeText={setNewComment}
         />
         <TouchableOpacity onPress={handleAddComment} style={styles.sendButton}>
-          <Ionicons name="send" size={24} color="#fff" />
+          <FontAwesome5 name="paper-plane" size={20} color="#fff" solid />
         </TouchableOpacity>
       </View>
 

@@ -20,7 +20,6 @@ import { auth, db } from "../../../../firebase-config";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
-import { UserContext } from "../../../Context/UserContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -37,8 +36,8 @@ const LoginScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId:
-      "815192260939-5b7arvmf9m38erjvd2uv97err5ac4sl2.apps.googleusercontent.com",
+    androidClientId:
+      "815192260939-ol3ia55oerq5l5o6ardq1fnod6go50h1.apps.googleusercontent.com", // Obtido do google-services.json
     redirectUri: "https://auth.expo.io/@elisa_expo/App3triad",
   });
 
@@ -58,6 +57,21 @@ const LoginScreen = () => {
     }
   }, [response]);
 
+  /*  const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const { accessToken, idToken } = await GoogleSignin.signIn();
+      
+      // Usar o idToken para autenticar com o Firebase
+      const credential = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(credential);
+      
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }; */
+
   useFocusEffect(
     React.useCallback(() => {
       setEmail("");
@@ -67,17 +81,17 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     setErrorMessage(""); // Limpa a mensagem de erro antes de tentar login
-  
+
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-  
-       /*  // Verificar se o email foi confirmado
+
+        /*  // Verificar se o email foi confirmado
         if (!user.emailVerified) {
           setErrorMessage("Por favor, verifique seu email antes de fazer login.");
           return;
         } */
-  
+
         // Caso o email esteja verificado, prosseguir
         checkIfUserIsAdmin(user.uid);
       })
@@ -126,7 +140,7 @@ const LoginScreen = () => {
 
   return (
     <KeyboardAvoidingView
-     style={styles.container}
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} // Ajuste o deslocamento no iOS
     >
@@ -165,13 +179,24 @@ const LoginScreen = () => {
             {errorMessage ? (
               <Text style={styles.errorText}>{errorMessage}</Text>
             ) : null}
-            <Text style={styles.link} onPress={() => navigation.navigate("ResetPassword")}>Esqueceu a senha?</Text>
+            <Text
+              style={styles.link}
+              onPress={() => navigation.navigate("ResetPassword")}
+            >
+              Esqueceu a senha?
+            </Text>
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
             <View style={styles.googleButton}>
               <TouchableOpacity onPress={() => promptAsync()}>
-                <Text style={styles.googleButtonText}>Acessar com Google</Text>
+                {/* Ícone do Google seguido do texto */}
+                <View style={styles.googleButtonContent}>
+                  <FontAwesome5 name="google" size={20} color="#fff" />
+                  <Text style={styles.googleButtonText}>
+                    Acessar com Google
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
             <Text style={styles.linkLogin}>

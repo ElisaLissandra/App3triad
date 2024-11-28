@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "80%",
-    height: 60,
+    height: 50,
     backgroundColor: "#0097B2", 
     justifyContent: "center",
     alignItems: "center",
@@ -67,25 +67,21 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     width: "80%",
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ED1515',
-    justifyContent: "center",
-    alignItems: "center",
+    height: 50,
+    backgroundColor: '#ED1515', 
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 8,
-    padding: 10,
+    alignItems: 'center',
   },
-  googleIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
+  googleButtonContent: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
   },
   googleButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
-
+    marginLeft: 10, // Espaçamento entre o ícone e o texto
   },
   linkLogin: {
     color: '#303030', 

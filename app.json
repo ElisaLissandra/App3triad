@@ -18,13 +18,18 @@
     "android": {
       "package": "com.elisa_expo.App3triad",
       "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
-      "newArchEnabled": true
+      "newArchEnabled": true,
+      "googleServicesFile": "./google-services.json"
+
     },
     "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/1831b5da-99d6-4203-a385-040bd1090c90"
     },
-    "plugins": ["expo-secure-store"],
+    "plugins": [
+      "expo-secure-store",
+      "@react-native-google-signin/google-signin"
+    ],
     "platforms": ["android", "web"]
   }
 }

@@ -21,14 +21,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
-/*   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
-    fontSize: 16,
-  }, */
+
   input: {
     width: "100%",
     height: 50,
@@ -40,7 +33,7 @@ const styles = StyleSheet.create({
     /* backgroundColor: "#fff", */
   },
   button: {
-    height: 60,
+    height: 50,
     backgroundColor: "#0097B2", 
     justifyContent: "center",
     alignItems: "center",

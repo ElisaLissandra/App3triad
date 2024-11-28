@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_number": "815192260939",
+    "project_id": "triad-c44fc",
+    "storage_bucket": "triad-c44fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815192260939:android:ae66ee6079d9210d4da8ce",
+        "android_client_info": {
+          "package_name": "com.elisa_expo.App3triad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "815192260939-ol3ia55oerq5l5o6ardq1fnod6go50h1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elisa_expo.App3triad",
+            "certificate_hash": "6b6df84da72f553a1e33835737cb229122c97df9"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHFmDEPQdKq3P9eyfCI7xjI46F5FT07cI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "815192260939-vmtk6modchamfb7ucgpj1cudcku0lqi1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

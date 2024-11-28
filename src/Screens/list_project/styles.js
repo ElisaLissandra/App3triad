@@ -20,6 +20,9 @@ const styles = StyleSheet.create({
     flex: 1, 
     textAlign: "center", 
   },
+  newCommentIcon: {
+    marginLeft: 8, 
+  },
   scrollContainer: {
     flex: 1, 
     marginBottom: 20, 

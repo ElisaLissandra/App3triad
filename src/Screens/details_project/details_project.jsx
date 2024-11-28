@@ -21,7 +21,6 @@ import * as MediaLibrary from "expo-media-library";
 import { Picker } from "@react-native-picker/picker";
 import { UserContext } from "../../Context/UserContext";
 
-
 const DetailsProjectScreen = () => {
   const route = useRoute();
   const { project } = route.params;
@@ -68,7 +67,10 @@ const DetailsProjectScreen = () => {
           setProjectUser(projectUserData); // Define os dados do solicitante do projeto
         }
       } catch (error) {
-        console.error("Erro ao buscar informações do usuário do projeto:", error);
+        console.error(
+          "Erro ao buscar informações do usuário do projeto:",
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -341,13 +343,16 @@ const DetailsProjectScreen = () => {
             </View>
           )}
           <View>
-            {selectedStatus === "Faltando Informações" && (
+            {(selectedStatus === "Faltando Informações" ||
+              selectedStatus === "Concluído") && (
               <TouchableOpacity
                 style={styles.statusButton}
                 onPress={handleComment}
               >
                 <Text style={styles.statusButtonText}>
-                  Adicionar mais informações
+                  {selectedStatus === "Faltando Informações"
+                    ? "Adicionar mais informações"
+                    : "Marcar reunião"}
                 </Text>
               </TouchableOpacity>
             )}
