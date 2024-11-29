@@ -107,7 +107,7 @@ const LoginScreen = () => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         if (userData.isAdmin) {
-          console.log("Usuário é admin");
+          //console.log("Usuário é admin");
           //navigation.navigate("AdminDashboard");
           navigation.navigate("ListProject");
         } else {

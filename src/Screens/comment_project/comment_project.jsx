@@ -131,7 +131,7 @@ const CommentProjectScreen = () => {
           timestamp: serverTimestamp(),
         });
 
-        console.log("Imagem enviada com sucesso!");
+        //console.log("Imagem enviada com sucesso!");
       } catch (error) {
         console.error("Erro ao enviar imagem:", error);
       } finally {
@@ -149,7 +149,7 @@ const CommentProjectScreen = () => {
     setIsLoading(true);
     const pickerResult = await DocumentPicker.getDocumentAsync({ type: "*/*" });
 
-    console.log("Resultado da seleção do arquivo:", pickerResult); // Verifique a estrutura completa
+   // console.log("Resultado da seleção do arquivo:", pickerResult); // Verifique a estrutura completa
 
     // Verifica se o resultado é um sucesso e se existe um arquivo selecionado
     if (!pickerResult.canceled && pickerResult.assets?.length > 0) {
@@ -181,7 +181,7 @@ const CommentProjectScreen = () => {
           timestamp: serverTimestamp(),
         });
 
-        console.log("Arquivo enviado com sucesso!");
+        //console.log("Arquivo enviado com sucesso!");
       } catch (error) {
         console.error("Erro ao enviar o arquivo:", error);
       } finally {
@@ -311,7 +311,7 @@ const CommentProjectScreen = () => {
             newComment.id
           );
           await updateDoc(commentDocRef, { visualizado: true });
-          console.log(`Comentário ${newComment.id} marcado como visualizado.`);
+          //console.log(`Comentário ${newComment.id} marcado como visualizado.`);
         }
       }
 
@@ -319,9 +319,9 @@ const CommentProjectScreen = () => {
       const allCommentsViewed = commentData.every((comment) => {
         // Verifique se visualizado é verdadeiro e não nulo
         const isViewed = comment.visualizado === true;
-        console.log(
+       /*  console.log(
           `Comentário ${comment.id}: visualizado = ${comment.visualizado}, isViewed = ${isViewed}`,
-        );
+        ); */
         return isViewed;
       });
 
@@ -329,14 +329,14 @@ const CommentProjectScreen = () => {
       if (allCommentsViewed) {
         try {
           await updateDoc(projectRef, { hasNewComments: false });
-          console.log("hasNewComments atualizado para false.");
+         // console.log("hasNewComments atualizado para false.");
         } catch (error) {
           console.error("Erro ao atualizar hasNewComments:", error);
         }
       } else {
         try {
           await updateDoc(projectRef, { hasNewComments: true });
-          console.log("hasNewComments atualizado para true.");
+         // console.log("hasNewComments atualizado para true.");
         } catch (error) {
           console.error("Erro ao atualizar hasNewComments:", error);
         }

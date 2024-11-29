@@ -26,10 +26,6 @@ import { getAuth } from "firebase/auth";
 
 const ProjectScreen = () => {
   const { userData } = useContext(UserContext);
-  console.log(userData);
-  /* const db = getFirestore();
-  const auth = getAuth();
-  const user = auth.currentUser; */
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
@@ -82,7 +78,7 @@ const ProjectScreen = () => {
   useEffect(() => {
     if (!userData) {
       // Exibe um estado de carregamento se o userData ainda não estiver disponível
-      console.log("Usuário não encontrado no contexto.");
+      //console.log("Usuário não encontrado no contexto.");
       return;
     }
 

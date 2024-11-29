@@ -88,7 +88,7 @@ const RequestProject = () => {
       }
     } catch (error) {
       Alert.alert("Erro ao anexar arquivo:", error.message);
-      console.log("Erro ao anexar arquivo:", error.message);
+     // console.log("Erro ao anexar arquivo:", error.message);
     }
   };
 
