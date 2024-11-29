@@ -20,6 +20,8 @@ import { auth, db } from "../../../../firebase-config";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
+import { GOOGLE_CLIENT_ID } from '@env';
+
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -36,10 +38,10 @@ const LoginScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId:
-      "815192260939-ol3ia55oerq5l5o6ardq1fnod6go50h1.apps.googleusercontent.com", // Obtido do google-services.json
+    androidClientId: GOOGLE_CLIENT_ID,  // Usando o valor do .env
     redirectUri: "https://auth.expo.io/@elisa_expo/App3triad",
   });
+  
 
   React.useEffect(() => {
     if (response?.type === "success") {
