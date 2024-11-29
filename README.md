@@ -6,16 +6,24 @@ Atividade Extensiva realizada para a faculdade em parceria com a empresa 3triad,
 ## Objetivo do projeto
 Aplicativo de controle de briefings em Android permitirá a gestão de projetos e o acompanhamento de demandas dos clientes.
 
-## Ferramenta necessária
+## Tecnologias utilizadas
+- React Native no front-end
+- Firebase no back-end
 
-- Emulador Android com Expo Go
-
+## Requisitos
+- Emulador Android com Expo Go  
+**OU**  
 - Aplicativo Expo Go no celular
 
 ## Dependências 
 - Executar o **npm install** para adiciona o **node_modules**
 
 - Executar o **npx expo start** para iniciar o projeto.
+
+
+## Configuração do ambiente
+- Utilize o arquivo .env.example para fazer a configuração necesssária para o funcionamento do Firebase Console e do Google Developer Console no projeto.
+Crie o arquivo .env baseado no .env.example  e adicione suas informações, como as chaves e credenciais. 
 
 ## Links Draiow e Figma
 - Diagramas:
